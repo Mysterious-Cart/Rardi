@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CHKS.Data;
 using Microsoft.AspNetCore.Identity;
 using CHKS.Models;
+using CHKS.Services;
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -25,7 +26,8 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
 builder.Services.AddScoped<CHKS.mydbService>();
-builder.Services.AddDbContext<CHKS.Data.mydbContext>(options =>
+builder.Services.AddScoped<RardiReportService>();
+builder.Services.AddDbContext<CHKS.Data.RardiContext>(options =>
 {
     options.UseMySql(builder.Configuration.GetConnectionString("mydbConnection"), ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("mydbConnection")));
 });

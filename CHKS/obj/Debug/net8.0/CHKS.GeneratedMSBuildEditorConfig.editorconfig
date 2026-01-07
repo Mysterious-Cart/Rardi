@@ -9,127 +9,133 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = CHKS
 build_property.RootNamespace = CHKS
-build_property.ProjectDir = C:\Users\Kim hong\Documents\GitHub\Pos\CHKS\
+build_property.ProjectDir = F:\Projects\Rardi\Pos\chks\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\Kim hong\Documents\GitHub\Pos\CHKS
+build_property.MSBuildProjectDirectory = F:\Projects\Rardi\Pos\chks
 build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/App.razor]
+[F:/Projects/Rardi/Pos/chks/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/AddApplicationRole.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/AddApplicationRole.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRkQXBwbGljYXRpb25Sb2xlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/AddApplicationUser.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/AddApplicationUser.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRkQXBwbGljYXRpb25Vc2VyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/ApplicationRoles.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/AdminDashboardPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5EYXNoYm9hcmRQYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/Projects/Rardi/Pos/chks/Pages/ApplicationRoles.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXBwbGljYXRpb25Sb2xlcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/ApplicationUsers.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/ApplicationUsers.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXBwbGljYXRpb25Vc2Vycy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/Cars.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/Cars.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2Fycy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/Company.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/Company.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29tcGFueS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/Dailies.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/Dailies.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFpbGllcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/EditApplicationUser.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/EditApplicationUser.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRWRpdEFwcGxpY2F0aW9uVXNlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/ExpenseMenu.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/ExpenseMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXhwZW5zZU1lbnUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/Histories.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/Histories.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSGlzdG9yaWVzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/Inventories.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/Inventories.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52ZW50b3JpZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/Login.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/MainMenu.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/MainMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFpbk1lbnUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/NewProduct.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/NewProduct.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmV3UHJvZHVjdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/PaymentForm.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/PaymentForm.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudEZvcm0ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/PrintPage.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/PrintPage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpbnRQYWdlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/Profile.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/Profile.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/ReciptView.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/ReciptView.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjaXB0Vmlldy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/SecurityCode.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/SecurityCode.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VjdXJpdHlDb2RlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/SingleInputPopUp.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/SingleInputPopUp.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2luZ2xlSW5wdXRQb3BVcC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/Statistic.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/Statistic.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3RhdGlzdGljLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/Unauthorized.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/Unauthorized.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVW5hdXRob3JpemVkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/_Imports.razor]
+[F:/Projects/Rardi/Pos/chks/Pages/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Shared/LoginLayout.razor]
+[F:/Projects/Rardi/Pos/chks/Shared/LoginLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXExvZ2luTGF5b3V0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Shared/MainLayout.razor]
+[F:/Projects/Rardi/Pos/chks/Shared/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Shared/RedirectToLogin.razor]
+[F:/Projects/Rardi/Pos/chks/Shared/RedirectToLogin.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFJlZGlyZWN0VG9Mb2dpbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/_Imports.razor]
+[F:/Projects/Rardi/Pos/chks/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Kim hong/Documents/GitHub/Pos/CHKS/Pages/_Host.cshtml]
+[F:/Projects/Rardi/Pos/chks/Pages/_Host.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

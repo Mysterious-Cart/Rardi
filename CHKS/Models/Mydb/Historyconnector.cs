@@ -31,5 +31,12 @@ namespace CHKS.Models.mydb
         public string Note { get; set; }
 
         public string Code { get; set; }
+
+        public decimal Total { get; set; }
+        
+        public Historyconnector()
+        {
+            Total = Qty.GetValueOrDefault() - Export.GetValueOrDefault();
+        }
     }
 }

@@ -1,31 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
+using CHKS.Data;
+using CHKS.Models.mydb;
 
 namespace CHKS.Pages
 {
     public partial class Inventories
     {
-        [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
-
-        [Inject]
-        protected NavigationManager NavigationManager { get; set; }
 
         [Inject]
         protected DialogService DialogService { get; set; }
-
-        [Inject]
-        protected TooltipService TooltipService { get; set; }
-
-        [Inject]
-        protected ContextMenuService ContextMenuService { get; set; }
 
         [Inject]
         protected NotificationService NotificationService { get; set; }
@@ -33,13 +20,13 @@ namespace CHKS.Pages
         [Inject]
         protected mydbService mydbService { get; set; }
 
-        [Inject]
-        protected PublicCommand PublicCommand {get; set;}
-
         [Parameter]
         public string IsDialog {get; set;}
 
-        protected IEnumerable<CHKS.Models.mydb.Inventory> inventories;
+        [Inject]
+        public RardiContext RardiContext { get; set; }
+
+        protected IQueryable<Inventory> inventories;
 
         protected RadzenDataGrid<CHKS.Models.mydb.Inventory> grid0;
 
@@ -90,12 +77,17 @@ namespace CHKS.Pages
 
             await grid0.GoToPage(0);
 
-            inventories = await mydbService.GetInventories(new Query { Filter = $@"i =>( i.Name.Contains(@0) || i.Barcode.Contains(@0)) && i.IsDeleted == 0 ", FilterParameters = new object[] { search , "Service Charge"} });
+            await GetProduct();
         }
 
         protected override async Task OnInitializedAsync()
         {   
-            inventories = await mydbService.GetInventories(new Query { Filter = $@"i =>( i.Name.Contains(@0) || i.Barcode.Contains(@0)) && i.IsDeleted == 0", FilterParameters = new object[] { search , "Service Charge"} }); 
+            await GetProduct();
+        }
+
+        private async Task GetProduct()
+        {
+            inventories = RardiContext.Inventories.Where(i => i.IsDeleted == 0).Where(i => i.Name.Contains(search) || i.Barcode.Contains(search)).Where(i => i.Name != "Service Charge");
         }
 
         RadzenTextBox searchbar;

@@ -12,6 +12,8 @@ namespace CHKS.Models.mydb
         [Required]
         public string CashoutDate { get; set; }
 
+        public Guid Id  { get; set; } = Guid.NewGuid();
+        public DateTime? PaidAt { get; set; } = DateTime.UtcNow;
         [Required]
         public string Plate { get; set; }
 

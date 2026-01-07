@@ -1,67 +1,63 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
+using CHKS.Data;
+using CHKS.Models.mydb;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace CHKS.Pages
 {
     public partial class Histories
     {
-        [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
-
-        [Inject]
-        protected NavigationManager NavigationManager { get; set; }
 
         [Inject]
         protected DialogService DialogService { get; set; }
 
         [Inject]
-        protected TooltipService TooltipService { get; set; }
-
-        [Inject]
-        protected ContextMenuService ContextMenuService { get; set; }
-
-        [Inject]
         protected NotificationService NotificationService { get; set; }
 
         [Inject]
-        public mydbService mydbService { get; set; }
+        public mydbService MydbService { get; set; }
 
-        protected IEnumerable<CHKS.Models.mydb.History> histories;
+        [Inject]
+        public RardiContext RardiContext { get; set; }
 
-        protected RadzenDataGrid<CHKS.Models.mydb.History> grid0;
+        private IQueryable< History> histories;
 
-        protected bool editMode = false;
-        protected string date;
+        private RadzenDataGrid<History> grid0;
 
-        protected string search = "";
+        private bool editMode = false;
+        private string date;
 
-        protected string ChosenDate;
+        private string search = "";
+
+        private string ChosenDate;
 
         [Inject]
         protected SecurityService Security { get; set; }
 
-        protected async Task Search(ChangeEventArgs args)
+        private async Task Search(ChangeEventArgs args)
         {
             search = $"{args.Value}";
 
             await grid0.GoToPage(0);
 
-            histories = await mydbService.GetHistories(new Query { Filter = $@"i => (i.CashoutDate.Contains(@0) || i.Plate.Contains(@0)) && i.IsDeleted == 0", FilterParameters = new object[] { search }, Expand = "Car" });
+            await GetCustomerRecord();
         }
 
         protected override async Task OnInitializedAsync()
         {
-            histories = await mydbService.GetHistories(new Query { Filter = $@"i => (i.CashoutDate.Contains(@0) || i.Plate.Contains(@0) )&& i.IsDeleted == 0", FilterParameters = new object[] { search }, Expand = "Car" });
+           await GetCustomerRecord();
         }
 
-        protected async Task OpenHistory(Models.mydb.History args){
+        private async Task GetCustomerRecord()
+        {
+            histories = RardiContext.Histories.Include(i => i.Historyconnectors).Where(i => i.IsDeleted == 0 && (i.CashoutDate.Contains(search) || i.Plate.Contains(search)));
+        }
+
+        private async Task OpenHistory(History args){
             if(editMode == false){
                 await DialogService.OpenAsync<ReciptView>("", new Dictionary<string, object>{{"ID",args.CashoutDate}}, new DialogOptions{Width="50%", Height="70%"});
             }
@@ -69,11 +65,11 @@ namespace CHKS.Pages
 
 
 
-        protected async Task ExportClick(RadzenSplitButtonItem args)
+        private async Task ExportClick(RadzenSplitButtonItem args)
         {
             if (args?.Value == "csv")
             {
-                await mydbService.ExportHistoriesToCSV(new Query{
+                await MydbService.ExportHistoriesToCSV(new Query{
                     Filter = $@"{(string.IsNullOrEmpty(grid0.Query.Filter)? "true" : grid0.Query.Filter)}",
                     OrderBy = $"{grid0.Query.OrderBy}",
                     Expand = "Car",
@@ -83,7 +79,7 @@ namespace CHKS.Pages
 
             if (args == null || args.Value == "xlsx")
             {
-                await mydbService.ExportHistoriesToExcel(new Query
+                await MydbService.ExportHistoriesToExcel(new Query
                 {
                     Filter = $@"{(string.IsNullOrEmpty(grid0.Query.Filter)? "true" : grid0.Query.Filter)}",
                     OrderBy = $"{grid0.Query.OrderBy}",
@@ -93,7 +89,7 @@ namespace CHKS.Pages
             }
         }
 
-        protected async Task GridDeleteButtonClick( CHKS.Models.mydb.History history)
+        private async Task GridDeleteButtonClick( CHKS.Models.mydb.History history)
         {
             try
             {
@@ -101,7 +97,7 @@ namespace CHKS.Pages
                 {
                     history.IsDeleted = 1;
                     history.Info = "Deleted By:" + Security.User?.Name + "("+ DateTime.Now +")";
-                    await mydbService.UpdateHistory(history.CashoutDate, history);
+                    await MydbService.UpdateHistory(history.CashoutDate, history);
                     await grid0.Reload();
                 }else{
                     editMode = false;
@@ -119,23 +115,23 @@ namespace CHKS.Pages
             }
         }
 
-        protected async Task EditButtonClick(MouseEventArgs args, CHKS.Models.mydb.History data)
+        private async Task EditButtonClick(MouseEventArgs args, CHKS.Models.mydb.History data)
         {
             ChosenDate = data.CashoutDate;
             await grid0.EditRow(data);
             editMode = true;
         }
 
-        protected async Task GridRowUpdate(CHKS.Models.mydb.History args)
+        private async Task GridRowUpdate(CHKS.Models.mydb.History args)
         {
                 
-            await mydbService.UpdateHistory(args.CashoutDate,args);
+            await MydbService.UpdateHistory(args.CashoutDate,args);
             editMode = false;
 
         }
 
 
-         protected async Task SaveButtonClick(MouseEventArgs args, CHKS.Models.mydb.History data)
+        private async Task SaveButtonClick(MouseEventArgs args, CHKS.Models.mydb.History data)
         {
             Console.WriteLine(ChosenDate);
             if(ChosenDate == "01/01/0001" ){
@@ -147,10 +143,10 @@ namespace CHKS.Pages
             }
         }
 
-        protected async Task CancelButtonClick(MouseEventArgs args, CHKS.Models.mydb.History data)
+        private async Task CancelButtonClick(MouseEventArgs args, CHKS.Models.mydb.History data)
         {
             grid0.CancelEditRow(data);
-            await mydbService.CancelHistoryChanges(data);
+            await MydbService.CancelHistoryChanges(data);
             editMode = false;
         }
     }

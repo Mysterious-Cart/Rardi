@@ -1,0 +1,290 @@
+@page "/admin-dashboard"
+@attribute [Authorize]
+@using CHKS.Data
+@using Microsoft.EntityFrameworkCore
+@using Radzen.Blazor.Rendering
+@using Radzen
+@using System.Globalization
+
+<PageTitle>Admin Dashboard</PageTitle>
+<RadzenStack Gap="1.5rem" class="rz-mb-6" style="overflow: scroll;">
+    <RadzenCard class="rz-p-4" Style="background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" AlignItems="AlignItems.Center">
+                <RadzenIcon Icon="insights" Style="font-size:3rem;color:#fff;" />
+                <RadzenStack Gap="0.25rem">
+                    <RadzenText TextStyle="TextStyle.H4" Style="color:#fff;">Operations Control Center</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1" Style="color:#e0e7ff;">Trigger maintenance routines and observe live diagnostics.</RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+            <RadzenBadge Text="@(!string.IsNullOrWhiteSpace(executionStatus) ? executionStatus : "Idle")"
+                         BadgeStyle="@(isSuccess ? BadgeStyle.Success : BadgeStyle.Info)"
+                         Variant="Variant.Filled" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenRow Style="row-gap:1.5rem;">
+        <RadzenColumn Size="12" Medium="4">
+            <RadzenCard class="rz-p-4">
+                <RadzenStack Gap="0.75rem">
+                    <RadzenText TextStyle="TextStyle.Overline">Execution Summary</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H6">@(!string.IsNullOrWhiteSpace(debugMessage) ? debugMessage : "Awaiting first execution")</RadzenText>
+                    <RadzenProgressBar Value="@(isSuccess ? 100 : string.IsNullOrWhiteSpace(executionStatus) ? 15 : 60)"
+                                       ShowValue="false"
+                                       Variant="Variant.Filled" />
+                    <RadzenText TextStyle="TextStyle.Caption" Style="color:#607d8b;">
+                        Status refreshed at @DateTime.Now.ToString("HH:mm:ss")
+                    </RadzenText>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" Medium="4">
+            <RadzenCard class="rz-p-4">
+                <RadzenStack Gap="0.75rem">
+                    <RadzenText TextStyle="TextStyle.Overline">Diagnostics Channel</RadzenText>
+                    <RadzenAlert AlertStyle="AlertStyle.Info"
+                                 Variant="Variant.Flat"
+                                 Shade="Shade.Lighter"
+                                 Visible="@(!string.IsNullOrWhiteSpace(debugMessage))">
+                        <RadzenText TextStyle="TextStyle.Body2">@debugMessage</RadzenText>
+                    </RadzenAlert>
+                    <RadzenAlert AlertStyle="AlertStyle.Danger"
+                                 Variant="Variant.Outlined"
+                                 Shade="Shade.Lighter"
+                                 Visible="@(!string.IsNullOrWhiteSpace(errorMessage))">
+                        <RadzenText TextStyle="TextStyle.Body2">@errorMessage</RadzenText>
+                    </RadzenAlert>
+                    <RadzenText TextStyle="TextStyle.Caption" Style="color:#9e9e9e;">
+                        Review alerts before executing additional routines.
+                    </RadzenText>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" Medium="4">
+            <RadzenCard class="rz-p-4">
+                <RadzenStack Gap="0.75rem">
+                    <RadzenText TextStyle="TextStyle.Overline">Quick Actions</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Caption" Style="color:#607d8b;">
+                        Launch maintenance routines quickly; add new ones by extending the list below.
+                    </RadzenText>
+
+                    @foreach (var action in quickActions)
+                    {
+                        <RadzenStack Orientation="Orientation.Horizontal"
+                                     AlignItems="AlignItems.Center"
+                                     Gap="0.65rem"
+                                     Style="border:1px solid #e3e8f0;border-radius:12px;padding:0.85rem 0.9rem;background:#f7f9fc;cursor:pointer;transition:box-shadow 0.15s ease,transform 0.12s ease;"
+                                     @onclick="() => ConfirmAndRun(action)">
+
+                            <RadzenStack Gap="0.15rem" Class="rz-flex-1">
+                                <RadzenText TextStyle="TextStyle.Subtitle1">@action.Title</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Caption" Style="color:#607d8b;">@action.Description</RadzenText>
+                            </RadzenStack>
+
+                            <RadzenIcon Icon="play_circle" Style="color:#1e3c72;font-size:1.35rem;" />
+                        </RadzenStack>
+                    }
+
+                    <RadzenButton 
+                                Text="Refresh Diagnostics" Icon="refresh"
+                                Click="() => StateHasChanged()"
+                                ButtonStyle="ButtonStyle.Light" />
+
+                    <RadzenText TextStyle="TextStyle.Caption" Style="color:#9e9e9e;">
+                        Add more automation by registering another entry in <strong>quickActions</strong>.
+                    </RadzenText>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+@code {
+    private sealed record QuickActionItem(string Title, string Description, string Icon, ButtonStyle Style, Func<Task> Handler);
+
+    private string executionStatus = string.Empty;
+    private string debugMessage = string.Empty;
+    private string errorMessage = string.Empty;
+    private bool isSuccess = false;
+    private List<QuickActionItem> quickActions = new();
+
+    [Inject]
+    protected RardiContext RardiContext { get; set; }
+    [Inject]
+    protected DialogService DialogService { get; set; }
+    protected override void OnInitialized()
+    {
+        quickActions = new()
+        {
+            new QuickActionItem(
+                "Generate Keys",
+                "Re-seed IDs for all history rows (one-time fix).",
+                "key",
+                ButtonStyle.Secondary,
+                async () => await ExecuteWithDebug(nameof(InvokeKeyGenerationForAllUsersRecord), InvokeKeyGenerationForAllUsersRecord)),
+            new QuickActionItem(
+                "Parse Cashout Date",
+                "Parse CashoutDate text into PaidAt timestamps for legacy entries.",
+                "schedule",
+                ButtonStyle.Primary,
+                async () => await ExecuteWithDebug(nameof(ParseTimeFromCashoutDateToPaidAt), ParseTimeFromCashoutDateToPaidAt)),
+            new QuickActionItem(
+                "Generate Expense Keys",
+                "Re-seed IDs for all expense rows (one-time fix).",
+                "key",
+                ButtonStyle.Secondary,
+                async () => await ExecuteWithDebug(nameof(InvokeKeyGenerationForAllExpenseRecord), InvokeKeyGenerationForAllExpenseRecord)),
+            new QuickActionItem(
+                "Parse Expense Dates",
+                "Parse Key text into CreateAt timestamps for daily expenses.",
+                "schedule",
+                ButtonStyle.Primary,
+                async () => await ExecuteWithDebug(nameof(ParseTimeFromExpenseToCreatedAt), ParseTimeFromExpenseToCreatedAt)),
+            new QuickActionItem(
+                "Calculate History Connector Totals",
+                "Recalculate Total fields for all history connectors.",
+                "calculate",
+                ButtonStyle.Primary,
+                async () => await ExecuteWithDebug(nameof(CalculateTotalForHistoryConnectors), CalculateTotalForHistoryConnectors))
+        };
+    }
+
+    private async Task InvokeKeyGenerationForAllUsersRecord()
+    {
+        await RardiContext.Histories.ExecuteUpdateAsync(i => i.SetProperty(
+        h => h.Id, h => Guid.NewGuid()
+        ));
+    }
+
+    private async Task ParseTimeFromCashoutDateToPaidAt()
+    {
+        using var transaction = await RardiContext.Database.BeginTransactionAsync();
+        const string format = "dd/MM/yyyy";
+        const int batchSize = 1000;
+        var query = RardiContext.Histories.Select(h => new {h.CashoutDate });
+        var offset = 0;
+        while (true)
+        {
+            var batch = await query.Skip(offset).Take(batchSize).ToListAsync();
+            if (batch.Count == 0) break;
+
+            foreach (var item in batch)
+            {
+                var value = item.CashoutDate.Split('(', ':')[0].Trim();
+                if (DateTime.TryParseExact(value, format,
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
+                {
+                    RardiContext.Attach(new History {CashoutDate = item.CashoutDate, PaidAt = dt })
+                    .Property(x => x.PaidAt).IsModified = true;
+                }else{
+                    await transaction.RollbackAsync();
+                    throw new FormatException($"Invalid date format for History ID {item.CashoutDate}");
+                }
+            }
+
+            await RardiContext.SaveChangesAsync();
+            RardiContext.ChangeTracker.Clear();
+            offset += batchSize;
+        }
+
+        await transaction.CommitAsync();
+    }
+    
+
+    private async Task InvokeKeyGenerationForAllExpenseRecord()
+    {
+        await RardiContext.Dailyexpenses.ExecuteUpdateAsync(i => i.SetProperty(
+        h => h.Id, h => Guid.NewGuid()
+        ));
+    }
+
+    private async Task ParseTimeFromExpenseToCreatedAt()
+    {
+        using var transaction = await RardiContext.Database.BeginTransactionAsync();
+        const string format = "dd/MM/yyyy";
+        const int batchSize = 1000;
+        var query = RardiContext.Dailyexpenses.Select(h => new { h.Key });
+        var offset = 0;
+        while (true)
+        {
+            var batch = await query.Skip(offset).Take(batchSize).ToListAsync();
+            if (batch.Count == 0) break;
+
+            foreach (var item in batch)
+            {
+                var value = item.Key.Split(':')[0].Trim();
+                if (DateTime.TryParseExact(value, format,
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
+                {
+                    RardiContext.Attach(new Dailyexpense { Key = item.Key, CreatedAt = dt })
+                    .Property(x => x.CreatedAt).IsModified = true;
+                }
+                else
+                {
+                    await transaction.RollbackAsync();
+                    throw new FormatException($"Invalid date format for History ID {item.Key}");
+                }
+            }
+
+            await RardiContext.SaveChangesAsync();
+            RardiContext.ChangeTracker.Clear();
+            offset += batchSize;
+        }
+
+        await transaction.CommitAsync();
+    }
+
+    private async Task CalculateTotalForHistoryConnectors()
+    {
+        await RardiContext.Historyconnectors.ExecuteUpdateAsync(i => i.SetProperty(
+        h => h.Total, h => h.Export * h.Qty
+        ));
+    }
+
+    private async Task ExecuteWithDebug(string functionName, Func<Task> action)
+    {
+        try
+        {
+            executionStatus = "Running...";
+            debugMessage = $"Executing: {functionName} at {DateTime.Now:HH:mm:ss}";
+            errorMessage = string.Empty;
+            isSuccess = false;
+            StateHasChanged();
+
+            await action();
+
+            executionStatus = "Success";
+            debugMessage = $"Completed: {functionName} at {DateTime.Now:HH:mm:ss}";
+            isSuccess = true;
+        }
+        catch (Exception ex)
+        {
+            executionStatus = "Failed";
+            errorMessage = $"Error in {functionName}: {ex.Message}";
+            isSuccess = false;
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private async Task ConfirmAndRun(QuickActionItem action)
+    {
+        var confirmed = await DialogService.Confirm(
+            $"Run \"{action.Title}\"?\n{action.Description}",
+            "Confirm Quick Action",
+            new ConfirmOptions
+            {
+                OkButtonText = "Run",
+                CancelButtonText = "Cancel",
+                CloseDialogOnEsc = true
+            });
+
+        if (confirmed == true)
+        {
+            await action.Handler();
+        }
+    }
+}

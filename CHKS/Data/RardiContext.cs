@@ -6,13 +6,13 @@ using CHKS.Models.mydb;
 
 namespace CHKS.Data
 {
-    public partial class mydbContext : DbContext
+    public partial class RardiContext : DbContext
     {
-        public mydbContext()
+        public RardiContext()
         {
         }
 
-        public mydbContext(DbContextOptions<mydbContext> options) : base(options)
+        public RardiContext(DbContextOptions<RardiContext> options) : base(options)
         {
         }
 

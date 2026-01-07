@@ -1,12 +1,122 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\soeng\\OneDrive\\Documents\\GitRepoForPos\\Pos\\CHKS\\",
-  "Documents": [],
+  "WorkspaceRootPath": "F:\\Projects\\Rardi\\Pos\\CHKS\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|f:\\projects\\rardi\\pos\\chks\\pages\\statistic.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|solutionrelative:pages\\statistic.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|f:\\projects\\rardi\\pos\\chks\\pages\\statistic.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|solutionrelative:pages\\statistic.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|f:\\projects\\rardi\\pos\\chks\\services\\rardireportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|solutionrelative:services\\rardireportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|f:\\projects\\rardi\\pos\\chks\\pages\\singleinputpopup.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|solutionrelative:pages\\singleinputpopup.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|f:\\projects\\rardi\\pos\\chks\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|f:\\projects\\rardi\\pos\\chks\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{09D51C50-173A-4E49-A979-462497317170}|CHKS.csproj|solutionrelative:app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SingleInputPopUp.razor.cs",
+              "DocumentMoniker": "F:\\Projects\\Rardi\\Pos\\CHKS\\Pages\\SingleInputPopUp.razor.cs",
+              "RelativeDocumentMoniker": "Pages\\SingleInputPopUp.razor.cs",
+              "ToolTip": "F:\\Projects\\Rardi\\Pos\\CHKS\\Pages\\SingleInputPopUp.razor.cs",
+              "RelativeToolTip": "Pages\\SingleInputPopUp.razor.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAQwCwAAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-20T12:28:37.537Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Statistic.razor.cs",
+              "DocumentMoniker": "F:\\Projects\\Rardi\\Pos\\CHKS\\Pages\\Statistic.razor.cs",
+              "RelativeDocumentMoniker": "Pages\\Statistic.razor.cs",
+              "ToolTip": "F:\\Projects\\Rardi\\Pos\\CHKS\\Pages\\Statistic.razor.cs",
+              "RelativeToolTip": "Pages\\Statistic.razor.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAIwDUAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-20T12:27:51.831Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Statistic.razor",
+              "DocumentMoniker": "F:\\Projects\\Rardi\\Pos\\CHKS\\Pages\\Statistic.razor",
+              "RelativeDocumentMoniker": "Pages\\Statistic.razor",
+              "ToolTip": "F:\\Projects\\Rardi\\Pos\\CHKS\\Pages\\Statistic.razor",
+              "RelativeToolTip": "Pages\\Statistic.razor",
+              "ViewState": "AgIAADYAAAAAAAAAAAAAAHcAAABHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-20T12:27:48.122Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "RardiReportService.cs",
+              "DocumentMoniker": "F:\\Projects\\Rardi\\Pos\\CHKS\\Services\\RardiReportService.cs",
+              "RelativeDocumentMoniker": "Services\\RardiReportService.cs",
+              "ToolTip": "F:\\Projects\\Rardi\\Pos\\CHKS\\Services\\RardiReportService.cs",
+              "RelativeToolTip": "Services\\RardiReportService.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAQwAcAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-20T12:25:27.549Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Program.cs",
+              "DocumentMoniker": "F:\\Projects\\Rardi\\Pos\\CHKS\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "F:\\Projects\\Rardi\\Pos\\CHKS\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-20T12:24:52.767Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "App.razor",
+              "DocumentMoniker": "F:\\Projects\\Rardi\\Pos\\CHKS\\App.razor",
+              "RelativeDocumentMoniker": "App.razor",
+              "ToolTip": "F:\\Projects\\Rardi\\Pos\\CHKS\\App.razor",
+              "RelativeToolTip": "App.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-20T12:24:49.68Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

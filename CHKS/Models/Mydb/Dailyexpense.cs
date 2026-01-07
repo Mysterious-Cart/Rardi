@@ -16,5 +16,8 @@ namespace CHKS.Models.mydb
         [Key]
         [Required]
         public string Key { get; set; }
+    
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public Guid Id { get; set; } = Guid.NewGuid();
     }
 }

@@ -1,154 +1,167 @@
 @page "/statistic"
-
-@attribute [Authorize(Roles="Admin,Dev")]
-
-<head>
-    <link href="css/Page.css" rel="stylesheet"/>
-</head>
+@using CHKS.Services
+@attribute [Authorize(Roles = "Admin,Dev")]
 
 <PageTitle>Statistic</PageTitle>
 
-<RadzenStack Orientation="Orientation.Horizontal" Style="margin-top: 30px; margin-left:30px">
-
-    <RadzenStack Style="width: 80%">
-
-        <RadzenStack Orientation="Orientation.Horizontal" Style="overflow-x:scroll; overflow-y:hidden" AlignItems="AlignItems.Center">
-            <RadzenCard class="Statistic-Info-Overview-Card" Style="height: 150px;" >
-                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Wrap="FlexWrap.NoWrap" class="RadzenStack" Style="height:300px">
-                    <RadzenLabel Text="ប្រាក់ចំណេញ:" class="RadzenLabel" />
-                    <RadzenText Text="@(Math.Round((((ProductTotal-ImportTotal) + ServiceTotal)-(MonthlyExpense.Sum(i => i.Expense).GetValueOrDefault())).GetValueOrDefault(),2).ToString() + ' ' +'$')" class="RadzenText"/>
-                    <RadzenText Text = "((សរុបទំនេញ - សរុបតម្លៃដើម) - ចំណាយ)) + សេវាសរុប" style="font-size: small; color:gray; "/>
-                </RadzenStack>
-            </RadzenCard>
-            <RadzenCard class="Statistic-Info-Overview-Card" >
-                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Wrap="FlexWrap.NoWrap" class="RadzenStack">
-                    <RadzenRow JustifyContent="JustifyContent.Center" style="width:100%; height:25px;">
-                        <RadzenLabel Text="សរុប:" class="RadzenLabel" />
-                        <RadzenButton Icon="info_outline" IconColor="White" Click="@ShowHideCashInfo" Style="background-color: transparent; border-radius:10px; margin-left:auto; margin-bottom:auto"/>
-                    </RadzenRow>
-                    <RadzenText Text="@(Math.Round(Total.GetValueOrDefault(),2).ToString() + ' '+ '$')" class="RadzenText"/>       
-                </RadzenStack>
-            </RadzenCard>
-
-            <RadzenCard class="@SubCardClass" >
-                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" class="RadzenStack" Gap="1px">
-                    <RadzenRow style="width:100%">
-                        <RadzenLabel Text="Bank: "/>  
-                        <RadzenText Text=@TotalBank.ToString() class="RadzenText" />
-                    </RadzenRow>
-                    <RadzenRow style="width:100%">
-                        <RadzenLabel Text="Dollar: "/>  
-                        <RadzenText Text="@TotalDollar.ToString()" class="RadzenText"/>
-                    </RadzenRow>
-                    <RadzenRow style="width:100%">
-                        <RadzenLabel Text="Baht: "/>  
-                        <RadzenText Text="@Math.Round(TotalBaht.GetValueOrDefault()).ToString()" class="RadzenText" />
-                    </RadzenRow>
-                    <RadzenRow style="width:100%">
-                        <RadzenLabel Text="Riel: "/>  
-                        <RadzenText Text="@Math.Round(TotalRiel.GetValueOrDefault()).ToString(@NumberFormat)" class="RadzenText" />
-                    </RadzenRow>
-                </RadzenStack>  
-            </RadzenCard>
-            <RadzenCard class="Statistic-Info-Overview-Card" >
-                <RadzenStack Orientation = "Orientation.Vertical" AlignItems = "AlignItems.End" Wrap="FlexWrap.NoWrap" class="RadzenStack">
-                    <RadzenLabel Text="សរុបតម្លៃដើម:" class="RadzenLabel" />
-                    <RadzenText Text="@(Math.Round(ImportTotal.GetValueOrDefault(),2).ToString() + ' '+ '$')" class="RadzenText"/>
-                </RadzenStack>
-            </RadzenCard>
-            <RadzenCard class="Statistic-Info-Overview-Card" >
-                <RadzenStack Orientation = "Orientation.Vertical" AlignItems = "AlignItems.End" Wrap="FlexWrap.NoWrap" class="RadzenStack">
-                    <RadzenLabel Text="សរុបទំនេញ:" class="RadzenLabel"/>
-                    <RadzenText Text="@(Math.Round(ProductTotal.GetValueOrDefault(),2).ToString() + ' '+ '$')" class="RadzenText"/>
-                </RadzenStack>
-            </RadzenCard>
-            <RadzenCard class="Statistic-Info-Overview-Card" >
-                <RadzenStack Orientation = "Orientation.Vertical" AlignItems = "AlignItems.End" Wrap="FlexWrap.NoWrap" class="RadzenStack" >
-                    <RadzenLabel Text="សរុបសេវា:" class="RadzenLabel"/>
-                    <RadzenText Text="@(Math.Round(ServiceTotal.GetValueOrDefault(),2).ToString() + ' '+ '$' )"   class="RadzenText"/>        
-                </RadzenStack>
-            </RadzenCard>
-            <RadzenCard class="Statistic-Info-Overview-Card">
-                <RadzenStack Orientation = "Orientation.Vertical" AlignItems = "AlignItems.End" Wrap="FlexWrap.NoWrap" class="RadzenStack">
-                    <RadzenLabel Text="ចំណាយ:" class="RadzenLabel"/>
-                    <RadzenText Text="@(Math.Round(MonthlyExpense.Sum(i => i.Expense).GetValueOrDefault()).ToString() + ' ' +'$')" class="RadzenText"/>                
-                </RadzenStack>
-            </RadzenCard>
-        </RadzenStack>
-
-        <RadzenCard class="Statistic-Setting-Card">
-            <RadzenStack>
-                <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
-                    <RadzenLabel Text="ពីថ្ងៃទី" Component="From" class="RadzenLabel"/>
-                    <RadzenDatePicker @bind-Value="@TimeStart" Name="From" DateFormat="dd/MM/yyyy" Max="@DateTime.Now" Change="@GetHistoryBaseOfChoosenDate" />
-                    <RadzenLabel Text="ដល់" Component="To" class="RadzenLabel"/>
-                    <RadzenDatePicker @bind-Value="@TimeEnd" InitialViewDate="@DateTime.Now" Name="To" DateFormat="dd/MM/yyyy" Max="@DateTime.Now" Change="@GetHistoryBaseOfChoosenDate"/>
-                </RadzenStack>
-            </RadzenStack>
-        </RadzenCard>
-
-        <RadzenStack Orientation="Orientation.Horizontal" style="height: 64dvh;">
-
-            <RadzenCard style="Width:50%;">
-                <RadzenDataGrid AllowFiltering="true" FilterMode="FilterMode.Advanced" GridLines="Radzen.DataGridGridLines.Horizontal" AllowVirtualization=true AllowSorting="true" @ref="@grid1" TItem ="Models.mydb.History" Data ="@Histories" Style="height: 100%; min-width:600px; width:100%; border-radius:25px;"
-                RowSelect="@OpenHistory" AllowColumnResize=true AllowPaging=false>
-                    <Columns>
-                        <RadzenDataGridColumn title="ថ្ងៃទី" TItem ="Models.mydb.History" Property="CashoutDate"></RadzenDataGridColumn>
-                        <RadzenDataGridColumn title="ផ្លាកលេខ" TItem ="Models.mydb.History" Property="Plate"></RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="ម៉ាកឡាន" TItem ="Models.mydb.History" Property="Car.Type"/>
-                        <RadzenDataGridColumn title="សរុប" TItem ="Models.mydb.History" Property="Total" FormatString="${0:N2}">
-                        </RadzenDataGridColumn>
-
-                    </Columns>
-                </RadzenDataGrid>
-            </RadzenCard>
-
-            <RadzenCard style="Width:50%;">
-
-                <RadzenDataGrid AllowFiltering="true" FilterMode="FilterMode.Advanced" GridLines="Radzen.DataGridGridLines.Horizontal" AllowVirtualization=true AllowSorting="true" @ref="@grid3" TItem ="Models.mydb.Historyconnector" Data ="@ProductWithoutImport" Style="height: 100%; min-width:600px; width:100%; border-radius:25px;"
-                AllowColumnResize=true RowUpdate="@GridRowUpdate">
-
-                    <Columns>
-                        <RadzenDataGridColumn title="ឈ្មោះ" TItem ="Models.mydb.Historyconnector" Property="Product"/>
-                        <RadzenDataGridColumn title="តម្លៃដើម" TItem ="Models.mydb.Historyconnector" Property="Inventory.Import">
-                            <EditTemplate Context="Historyconnector">
-                                <RadzenNumeric @bind-Value="@Historyconnector.Inventory.Import" Min=0/>
-                            </EditTemplate>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn >
-                            <EditTemplate Context = "Historyconnector">
-                                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium"
-                                    style="margin-top: 0.25rem; margin-right: 0.25rem; margin-bottom: 0.25rem"
-                                    Click=@(args => SaveButtonClick(args, Historyconnector)) @onclick:stopPropagation="true" />
-                                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium"
-                                    Click=@(args => CancelButtonClick(args, Historyconnector)) @onclick:stopPropagation="true" />
-                            </EditTemplate>
-                            <Template Context="Historyconnector">
-                                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium"
-                                    style="margin-top: 0.25rem; margin-right: 0.25rem; margin-bottom: 0.25rem"
-                                    Click=@(args => EditButtonClick(args, Historyconnector)) @onclick:stopPropagation="true" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-
-                </RadzenDataGrid>
-
-            </RadzenCard>
-
-        </RadzenStack>
-        
-            
+@if (PerformancePoints is null || RecentTransactions is null)
+{
+    <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Style="height:100vh;">
+        <RadzenProgressBar Mode="@ProgressBarMode.Indeterminate" Style="width: 200px;" />
     </RadzenStack>
+}
+else
+{
+    
+<RadzenStack Orientation="Orientation.Vertical" Gap="16px" Style="padding: 24px; max-height: 100vh; ">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+        JustifyContent="JustifyContent.SpaceBetween" Wrap="FlexWrap.Wrap" Gap="12px">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            <RadzenText Text="Statistics" Style="font-size: 24px; font-weight: 700;" />
+            <RadzenText Text="POS performance overview" Style="color: #6c757d;" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="8px" Wrap="FlexWrap.Wrap">
+            <RadzenButton Text="Today" Click="@(() => ApplyQuickRangeAsync(1))" ButtonStyle="ButtonStyle.Light" />
+            <RadzenButton Text="7d" Click="@(() => ApplyQuickRangeAsync(7))" ButtonStyle="ButtonStyle.Light" />
+            <RadzenButton Text="30d" Click="@(() => ApplyQuickRangeAsync(30))" ButtonStyle="ButtonStyle.Light" />
 
-    <RadzenCard Style=" width: 25%; height: 90dvh ; margin-right:auto">
-        <RadzenDataGrid  AllowFiltering="true" FilterMode="FilterMode.CheckBoxList" AllowPaging="true" AllowSorting="true" @ref="@grid2" TItem ="Models.mydb.Dailyexpense" Data ="@MonthlyExpense" Style="height: 60vh; border-radius:25px;Width:100%;" AllowColumnResize=true>
-            <Columns>
-                <RadzenDataGridColumn title="Date" TItem ="Models.mydb.Dailyexpense" Property="Key"></RadzenDataGridColumn>
-                <RadzenDataGridColumn title="Note" TItem ="Models.mydb.Dailyexpense" Property="Note" Width="150px"></RadzenDataGridColumn>
-                <RadzenDataGridColumn title="Total" TItem ="Models.mydb.Dailyexpense" Property="Expense" Width="80px" FormatString="$ {0:N2}"></RadzenDataGridColumn>
-            </Columns>
-        </RadzenDataGrid>
-    </RadzenCard>
+            <RadzenLabel Text="From" />
+            <RadzenDatePicker @bind-Value="@TimeStart" Name="From" DateFormat="dd/MM/yyyy" Max="@DateTime.Now" />
+            <RadzenLabel Text="To" />
+            <RadzenDatePicker @bind-Value="@TimeEnd" Name="To" DateFormat="dd/MM/yyyy" Max="@DateTime.Now" />
+            <RadzenButton Text="Refresh" Icon="refresh" Click="@RefreshPage" ButtonStyle="ButtonStyle.Primary" />
+        </RadzenStack>
+    </RadzenStack>
+    <RadzenStack style="overflow-y: auto; flex-grow: 1;" Gap="16px">
+        <RadzenRow>
+            <RadzenColumn Size="3" >
+                <RadzenCard Style="height: 140px; background: #0d6efd10; border: 1px solid #0d6efd20;">
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="6px">
+                        <RadzenText Text="Profit" Style="font-weight:600; color:#0d6efd;" />
+                        <RadzenText Text="@FormatCurrency(NetProfit)" Style="font-size:28px; font-weight:700;" />
+                        <RadzenText Text="After expenses" Style="color:#6c757d;" />
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="3">
+                <RadzenCard Style="height: 140px;">
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="6px">
+                        <RadzenText Text="Revenue" Style="font-weight:600; color:#198754;" />
+                        <RadzenText Text="@FormatCurrency(RevenueTotal)" Style="font-size:28px; font-weight:700;" />
+                        <RadzenText Text="Sales + services" Style="color:#6c757d;" />
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="3">
+                <RadzenCard Style="height: 140px;">
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="6px">
+                        <RadzenText Text="COGS" Style="font-weight:600; color:#dc3545;" />
+                        <RadzenText Text="@FormatCurrency(CogsTotal)" Style="font-size:28px; font-weight:700;" />
+                        <RadzenText Text="Inventory cost" Style="color:#6c757d;" />
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="3">
+                <RadzenCard Style="height: 140px;">
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="6px">
+                        <RadzenText Text="Gross Margin" Style="font-weight:600; color:#fd7e14;" />
+                        <RadzenText Text="@($"{GrossMarginPercent:N2}%")" Style="font-size:28px; font-weight:700;" />
+                        <RadzenText Text="(Revenue - COGS) / Revenue" Style="color:#6c757d;" />
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
 
+        <RadzenRow >
+            <RadzenColumn Size="8">
+                <RadzenCard Style="height: 360px;">
+                    <RadzenText Text="Revenue vs COGS" Style="font-weight:600; margin-bottom:8px; display:block;" />
+                    <RadzenChart Style="height: 300px;" ColorScheme="ColorScheme.Pastel">
+                        <RadzenAreaSeries Title="Revenue" TItem="TransactionPerformancePoint" ValueProperty="@(nameof(TransactionPerformancePoint.Revenue))"
+                            CategoryProperty="@(nameof(TransactionPerformancePoint.Date))" Data="@PerformancePoints" LineType="LineType.Solid" />
+                        <RadzenLineSeries Title="COGS" TItem="TransactionPerformancePoint" ValueProperty="@(nameof(TransactionPerformancePoint.Cogs))"
+                            CategoryProperty="@(nameof(TransactionPerformancePoint.Date))" Data="@PerformancePoints" LineType="LineType.Dotted" />
+                        <RadzenValueAxis  FormatString="${0:N0}" >
+                            <RadzenGridLines Visible="true" />
+                        </RadzenValueAxis>
+                        <RadzenCategoryAxis Formatter="@(date => ((DateTime)date).ToString("dd MMM"))" />
+                    </RadzenChart>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="4">
+                <RadzenCard Style="height: 360px;">
+                    <RadzenText Text="Payment mix" Style="font-weight:600; margin-bottom:8px; display:block;" />
+                    <RadzenChart Style="height: 300px;">
+                        <RadzenPieSeries TItem="PaymentSlice"
+                            CategoryProperty="Label" ValueProperty="Value" Radius="0.9"
+                        />
+                    </RadzenChart>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow >
+            <RadzenColumn Size="8">
+                <RadzenCard Style="height: 360px;">
+                    <RadzenText Text="Profit & Gross Margin" Style="font-weight:600; margin-bottom:8px; display:block;" />
+                    <RadzenChart Style="height: 300px;"   >
+                        <RadzenColumnSeries TItem="TransactionPerformancePoint" Title="Profit" ValueProperty="Profit"
+                            CategoryProperty="Date" Data="@PerformancePoints"/>
+                        <RadzenLineSeries TItem="TransactionPerformancePoint" Title="Gross Margin %"
+                            ValueProperty="GrossMarginPercent" CategoryProperty="Date" LineType="LineType.Solid"
+                            />
+                        <RadzenValueAxis FormatString="${0:N0}" />
+                        <RadzenValueAxis FormatString="{0}%" Min="0" Max="100" />
+                        <RadzenCategoryAxis FormatString="dd MMM" />
+                    </RadzenChart>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="4">
+                <RadzenCard Style="height: 360px;">
+                    <RadzenText Text="Income breakdown" Style="font-weight:600; margin-bottom:8px; display:block;" />
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="8px">
+                        <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenText Text="Bank" />
+                            <RadzenText Text="@FormatCurrency(ReportData?.Income.Bank)" />
+                        </RadzenRow>
+                        <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenText Text="USD" />
+                            <RadzenText Text="@FormatCurrency(ReportData?.Income.Dollar)" />
+                        </RadzenRow>
+                        <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenText Text="THB" />
+                            <RadzenText Text="@FormatCurrency(ReportData?.Income.Baht)" />
+                        </RadzenRow>
+                        <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenText Text="KHR" />
+                            <RadzenText Text="@FormatCurrency(ReportData?.Income.Riel)" />
+                        </RadzenRow>
+                        <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenText Text="Expenses" Style="color:#dc3545;" />
+                            <RadzenText Text="@FormatCurrency(ReportData?.Expense)" Style="color:#dc3545;" />
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenCard>
+            <RadzenText Text="Past Transactions" Style="font-weight:600; margin-bottom:8px; display:block;" />
+            <RadzenDataGrid Data="@RecentTransactions" TItem="History" AllowPaging="true" AllowSorting="true"
+                AllowFiltering="true" AllowVirtualization="true" PageSize="20" Style="height: 420px;"
+                RowSelect="@OpenHistory" GridLines="Radzen.DataGridGridLines.Horizontal">
+                <Columns>
+                    <RadzenDataGridColumn TItem="History" Property="PaidAt" Title="Date" FormatString="{0:dd/MM/yyyy}" />
+                    <RadzenDataGridColumn TItem="History" Property="Plate" Title="Plate" />
+                    <RadzenDataGridColumn TItem="History" Property="User" Title="User" />
+                    <RadzenDataGridColumn TItem="History" Property="Total" Title="Total" FormatString="$ {0:N2}" />
+                    <RadzenDataGridColumn TItem="History" Title="Payment">
+                        <Template Context="data">@PaymentMethodLabel(data)</Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenCard>
+    </RadzenStack>
 </RadzenStack>
 
+}

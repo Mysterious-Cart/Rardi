@@ -10,10 +10,10 @@ namespace CHKS.Controllers
 {
     public partial class ExportmydbController : ExportController
     {
-        private readonly mydbContext context;
+        private readonly RardiContext context;
         private readonly mydbService service;
 
-        public ExportmydbController(mydbContext context, mydbService service)
+        public ExportmydbController(RardiContext context, mydbService service)
         {
             this.service = service;
             this.context = context;

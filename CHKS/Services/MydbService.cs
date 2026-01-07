@@ -15,7 +15,7 @@ namespace CHKS
 {
     public partial class mydbService
     {
-        mydbContext Context
+        RardiContext Context
         {
            get
            {
@@ -23,10 +23,10 @@ namespace CHKS
            }
         }
 
-        private readonly mydbContext context;
+        private readonly RardiContext context;
         private readonly NavigationManager navigationManager;
 
-        public mydbService(mydbContext context, NavigationManager navigationManager)
+        public mydbService(RardiContext context, NavigationManager navigationManager)
         {
             this.context = context;
             this.navigationManager = navigationManager;
