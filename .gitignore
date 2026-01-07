@@ -1,6 +1,30 @@
-
-CHKS/bin/Debug/net7.0/runtimes/win-x86/native/libcef.dll
-CHKS/bin/Debug/net7.0/runtimes/win-x64/native/libcef.dll
+bin/
+obj/
+/.vs/
+*.user
+*.rsuser
+*.suo
+*.userprefs
+/bin/
+/obj/
+*.log
+*.tlog
+*.pidb
+*.mdb
+*.cache
+*.tmp
+*.dbmdl
+*.jfm
+out/
+publish/
+artifacts/
+node_modules/
+packages/
+*.nupkg
+*.snupkg
+.nuget/
+.idea/
+coverage/
 
 
 #Ignore vscode AI rules
