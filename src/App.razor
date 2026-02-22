@@ -1,0 +1,29 @@
+
+
+<CascadingAuthenticationState>
+<Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="@routeData">
+            <NotAuthorized>
+                <RedirectToLogin IsAuthenticated="@context.User.Identity.IsAuthenticated" />
+            </NotAuthorized>
+            <Authorizing>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <PageTitle>Loading...</PageTitle>
+                    <div class="text-center">
+                        <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+                    </div>
+                </LayoutView>
+            </Authorizing>
+        </AuthorizeRouteView>
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            
+        </LayoutView>
+    </NotFound>
+</Router>
+</CascadingAuthenticationState>
+
+
