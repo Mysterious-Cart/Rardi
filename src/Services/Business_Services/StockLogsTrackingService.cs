@@ -3,10 +3,9 @@ using CHKS.Data;
 using Microsoft.EntityFrameworkCore;
 namespace CHKS.Services;
 
-public class StockLogsTrackingService(IDbContextFactory<Rardi_Context> contextFactory, SecurityService securityService)
+public class StockLogsTrackingService(IDbContextFactory<Rardi_Context> contextFactory)
 {
     private readonly Rardi_Context _Context = contextFactory.CreateDbContext();
-    private readonly SecurityService securityService = securityService;
     private async Task<List<UserNotificationStamp>> GetAllUserNotificationStamps()
     {
         return await _Context.NotificationStampModels.Select(i => new UserNotificationStamp(
@@ -46,7 +45,8 @@ public class StockLogsTrackingService(IDbContextFactory<Rardi_Context> contextFa
         if (!_Context.StockLogs.Any(i => i.Id == LogsId))
             throw new ArgumentException("Log does not exist.", nameof(LogsId));
 
-        if ((await securityService.GetUserById(UserId)) is null)
+        var userExists = await _Context.Set<Aspnetuser>().AnyAsync(u => u.Id == UserId);
+        if (!userExists)
             throw new ArgumentException("User does not exist.", nameof(UserId));
 
         var Unseen_Stamp = new UserNotificationStampModel

@@ -21,7 +21,7 @@
                 SelectedValueChanged="@(async (int id) => await SelectGroup(id))">
                 @foreach(var group in Groups)
                 {
-                    <MudListItem Value="@group.Id" Gutters>
+                    <MudListItem Value="@group.Id">
                         <MudToolBar style="height:fit-content; width:100%">
                             <MudText Typo="Typo.body1">@group.Name</MudText>
                             <MudSpacer/>
@@ -107,9 +107,9 @@
     public EmployeeControl EmployeeService { get; set; }
     [Inject]
     public InventoryNotificationHubConnectionService InvenNotiConService { get; set; }
-    private IEnumerable<Group> Groups { get; set; }
-    private IEnumerable<Entity.Employee> Employees { get; set; }
-    private IEnumerable<Entity.StockLogs> stockLogs { get; set; }
+    private List<Group> Groups { get; set; } = [];
+    private List<Entity.Employee> Employees { get; set; } = [];
+    private IEnumerable<Entity.StockLogs> stockLogs { get; set; } = [];
     private int selectedGroupId = 0;
     private int selectedEmployeeId = 0;
     private int selectedCarId = 0;
@@ -118,10 +118,18 @@
 
     protected async override Task OnInitializedAsync()
     {
-        await GetRelevanceInfo();
-        InvenNotiConService.OnProductChanged += OnLogsReceived;
-        await InvenNotiConService.StartConnection();
+        
 
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetRelevanceInfo();
+            InvenNotiConService.OnProductChanged += OnLogsReceived;
+            await InvenNotiConService.StartConnection();
+        }
     }
 
     private void OnLogsReceived(Entity.StockLogs logs)

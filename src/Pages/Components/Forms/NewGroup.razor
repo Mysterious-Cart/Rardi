@@ -1,6 +1,7 @@
 @using MudBlazor
 @namespace CHKS.Pages.Components
 
+
 <MudDialog>
     <DialogContent>
         <MudForm @ref="form" Style="height:75px">
@@ -18,7 +19,7 @@
     private string GroupName = "";
     [Inject] public EmployeeControl ProductService { get; set; }
     [CascadingParameter] 
-    public MudDialogInstance MudDialog { get; set; }
+    public IMudDialogInstance MudDialog { get; set; }
     private void Close() => MudDialog.Close(DialogResult.Ok(true));
     private async Task Submit()
     {

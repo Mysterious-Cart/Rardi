@@ -18,23 +18,15 @@
         Type="InputType.Password" Required="true"
         RequiredError="Password is required" Immediate="true" ImmediateValidation="true"
     />
-    <form   data="LoginModel" @onsubmit="UserLogin" method="post" class="mud-form mud-form--suppress-implicit-submission">
-        <!--
-            Shit is, it won't work if you don't put the input field and bind it to the required input >:(
-            And the Request must be made through a form,or else the request is fucked CAUSE WHY?!??!?? CAUSE IT A BITCH!!!!!!!
-            JUST DON'T FIX IT NOR REFACTOR IT.
-
-            TIME WASTED: 2 Days. >:(
-        -->
-
-        <input type="hidden" name="userName" value="@LoginModel.Username" />
-        <input type="hidden" name="password" value="@LoginModel.Password" />
-
-        <MudButton ButtonType=ButtonType.Submit Variant="MudBlazor.Variant.Filled" Color="Color.Secondary"
-        FullWidth>
-            Login
-        </MudButton>
-    </form>
+        <form data="LoginModel" action="Account/Login" method="post" class="mud-form mud-form--suppress-implicit-submission">
+            <input type="hidden" name="userName" value="@LoginModel.Username" />
+            <input type="hidden" name="password" value="@LoginModel.Password" />
+            <input type="hidden" name="redirectUrl" value="@redirectUrl" />
+            <MudButton ButtonType=ButtonType.Submit Variant="MudBlazor.Variant.Filled" Color="Color.Secondary"
+            FullWidth>
+                Login
+            </MudButton>
+        </form>
 </MudForm>
 
 <MudAlert Severity="MudBlazor.Severity.Error"  @bind-Visible="@errorVisible" NoIcon>
@@ -43,22 +35,4 @@
 <MudAlert Severity="MudBlazor.Severity.Info" @bind-Visible="@infoVisible" NoIcon>
     @info
 </MudAlert>
-
-@code{
-    public async Task UserLogin(){
-        var uri = NavigationManager.ToAbsoluteUri($"Account/Login");
-        var result = await Http.PostAsJsonAsync(uri, LoginModel);
-        if (result.IsSuccessStatusCode)
-        {
-            var redirectUrl = result.ReasonPhrase.ToString();
-            var currentuser = await Http.PostAsync(NavigationManager.ToAbsoluteUri("Account/CurrentUser"), null);
-            Console.WriteLine(currentuser.Content);
-        }
-        else
-        {
-            var error = result.ReasonPhrase;
-            Console.WriteLine(error);
-        }
-    }
-}
 

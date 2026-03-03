@@ -1,12 +1,12 @@
 @inherits LayoutComponentBase
 @inject SecurityService SecurityService;
 
-<MudThemeProvider Theme="@KhmerTheme" />
+<MudThemeProvider IsDarkMode=false/>
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
+<MudLayout >
     <MudDrawer style="width:200px" Fixed="true" Elevation="1" Variant="@DrawerVariant.Persistent" Open >
         <MudNavMenu style="margin-top: 50px;" >
             <MudNavGroup Expanded title="Cashier" Icon="@Icons.Material.Filled.Sell">
@@ -36,8 +36,7 @@
             }
         </MudNavMenu>
     </MudDrawer>
-    <MudMainContent style="max-height: 100dvh; height:100dvh; overflow:hidden;
-        width:auto; position: relative; padding:20px; margin-left: 200px;">
+    <MudMainContent>
         @Body
     </MudMainContent>
 </MudLayout>
@@ -45,38 +44,7 @@
 @code {
     MudTheme KhmerTheme = new MudTheme()
     {
-        Typography = new Typography()
-        {
-            Body1 = new Body1()
-            {
-                FontFamily = new[] { "Khmer OS Siemreap", "Khmer OS Battambang", "Arial", "sans-serif" },
-
-            },
-            Body2 = new Body2()
-            {
-                FontFamily = new[] { "Khmer OS Siemreap", "Khmer OS Battambang", "Arial", "sans-serif" },
-
-            },
-            H5 = new H5()
-            {
-                FontFamily = new[] { "Khmer OS Siemreap", "Khmer OS Battambang", "Arial", "sans-serif" },
-
-            },
-            H6 = new H6()
-            {
-                FontFamily = new[] { "Khmer OS Siemreap", "Khmer OS Battambang", "Arial", "sans-serif" },
-
-            },
-            Caption = new Caption()
-            {
-                FontFamily = new[] { "Khmer OS Siemreap", "Khmer OS Battambang", "Arial", "sans-serif" },
-
-            },
-            Input = new Input
-            {
-                FontFamily = new[] { "Khmer OS Siemreap", "Khmer OS Battambang", "Arial", "sans-serif" }
-            }
-        },
+        Typography = new Typography(),
     };
 
 }

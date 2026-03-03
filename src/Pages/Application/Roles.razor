@@ -1,4 +1,6 @@
 @page "/Settings/Roles";
+@using CHKS.Entity;
+@using CHKS.Services;
 @inject SecurityService SecurityService;
 @inject IDialogService DialogService;
 @inject EmployeeControl employeeControl;
@@ -17,7 +19,7 @@
             </MudButton>
         </MudToolBar>
         <MudDataGrid EditMode="@DataGridEditMode.Form"
-                    CanceledEditingItem="@((Entity.Employee i) => OnUserRowDelete(i))"
+                    CanceledEditingItem="@((Employee i) => OnUserRowDelete(i))"
                     EditTrigger="@DataGridEditTrigger.Manual" ReadOnly="false"
                     @bind-Items="users" Hover="true" Dense="true">
             <Columns>
@@ -44,7 +46,6 @@
         </MudButton>
     </MudToolBar>
     <MudDataGrid T="Group"  
-            CommittedItemChanges="OnRoleEditComplete"
             EditMode="@DataGridEditMode.Form"
             CanceledEditingItem="OnRoleEditCancel"
             EditTrigger="@DataGridEditTrigger.Manual" ReadOnly="false"
@@ -64,10 +65,10 @@
 </MudStack>
 
 @code {
-    private List<Entity.Group> roles = [];
-    private MudDataGrid<Entity.Group> RoleDataGrid;
-    private MudDataGrid<Entity.Employee> UserDataGrid;
-    private List<Entity.Employee> users = [];
+    private List<Group> roles = [];
+    private MudDataGrid<Group> RoleDataGrid;
+    private MudDataGrid<Employee> UserDataGrid;
+    private List<Employee> users = [];
 
 
     protected override async Task OnInitializedAsync()
@@ -85,18 +86,18 @@
         await UserDataGrid.SetEditingItemAsync(users.FirstOrDefault(u => u.Id == 0, null));
     }
 
-    private async Task OnUserRowDelete(Entity.Employee args)
+    private async Task OnUserRowDelete(Employee args)
     {
         await employeeControl.DeleteEmployee(args.Id);
         await InvokeAsync(StateHasChanged);
     }
-    private async Task OnEditCancel(Entity.Employee args)
+    private async Task OnEditCancel(Employee args)
     {
         if (!IsEditingUser) return;
         users.Remove(args);
         IsEditingUser = false;
     }
-    private async Task OnUserEditComplete(Entity.Employee args)
+    private async Task OnUserEditComplete(Employee args)
     {
         if (!IsEditingUser) return;
         await employeeControl.CreateEmployee(args.Name, args.Group.FirstOrDefault()?.Id ?? 0);

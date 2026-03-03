@@ -50,7 +50,7 @@
 
     [Inject] public InventoryControlService InventoryControlService { get; set; }
     [Inject] public IDialogService MudDialogService { get; set; }
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
 
     void Cancel() => MudDialog.Cancel();
 
@@ -58,7 +58,7 @@
     async Task Submit() {
         if (product == null || amount == 0 || product.Setting.IsTracking == false)
         {
-            await MudDialogService.ShowMessageBox("Error", "Please fill in all the required fields.");
+            Console.WriteLine("Please fill in all the required fields.");
             return;
         }
         try{
@@ -66,7 +66,7 @@
 
         }catch(Exception e){
             Console.WriteLine(e.Message);
-            await MudDialogService.ShowMessageBox("Error", "Something went wrong. Please try again later.");
+            Console.WriteLine("Something went wrong. Please try again later.");
             IsError = true;
         }
 

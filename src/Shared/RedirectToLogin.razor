@@ -1,3 +1,4 @@
+@namespace CHKS.Shared
 @inject NavigationManager NavigationManager
 
 @code {
@@ -12,6 +13,7 @@
             var redirectUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
             if (!string.IsNullOrEmpty(redirectUrl))
             {
+                
                 NavigationManager.NavigateTo($"login?redirectUrl={Uri.EscapeDataString(redirectUrl)}", true);
             }
             else

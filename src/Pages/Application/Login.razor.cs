@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.WebUtilities;
 using CHKS.Services;
 using MudBlazor;
-using Microsoft.AspNetCore.WebUtilities;
 
 namespace CHKS.Pages
 {
@@ -11,8 +11,6 @@ namespace CHKS.Pages
         protected NavigationManager NavigationManager { get; set; }
         [Inject]
         protected SecurityService Security { get; set; }
-        [Inject]
-        private HttpClient Http { get; set; }
 
         protected string redirectUrl;
         protected string error;
@@ -30,6 +28,9 @@ namespace CHKS.Pages
 
         private LoginFormModel LoginModel = new LoginFormModel();
 
+        /// <summary>
+        /// Parses query string parameters used to display login status messages.
+        /// </summary>
         protected override async Task OnInitializedAsync()
         {
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
@@ -44,5 +45,6 @@ namespace CHKS.Pages
 
             await base.OnInitializedAsync();
         }
+
     }
 }

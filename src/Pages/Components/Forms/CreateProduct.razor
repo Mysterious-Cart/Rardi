@@ -1,6 +1,5 @@
 @attribute [Authorize]
 @namespace CHKS.Pages.Component
-@implements IAsyncDisposable;
 @using Components;
 @using Validator;
 @using QRCoder;
@@ -113,7 +112,7 @@
 
 @code{
     [CascadingParameter]
-    private MudDialogInstance MudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; }
 
     [Inject] protected MudBlazor.IDialogService MudDialogService { get; set; }
     [Inject] protected CartControlService cartControlService { get; set; }
@@ -157,7 +156,6 @@
         catch (Exception exc) { }
 
         MudDialog.Close(DialogResult.Ok<Product>(ProductMapper.ToProduct(Product)));
-        MudDialog.Dispose();
     }
 
     private string GenerateQR(Guid ProductId){
@@ -169,7 +167,6 @@
 
     private void Cancel(){
         MudDialog.Close(DialogResult.Cancel());
-        MudDialog.Dispose();
     }
 
     private async Task AdvanceSetting(){
@@ -183,7 +180,6 @@
     }
 
     public async ValueTask DisposeAsync(){
-        MudDialog.Dispose();
         GC.SuppressFinalize(this);
         GC.Collect();       
     }

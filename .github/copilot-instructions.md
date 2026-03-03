@@ -28,7 +28,7 @@ This is a .NET 8 Server-Side Blazor application (CHKS) with:
 ```powershell
 cd f:\Projects\Rardi_V1\src
 # Build
-dotnet build CHKS.csproj -c Development
+dotnet build CHKS.csproj -c Debug
 # Run
 dotnet run --project CHKS.csproj
 # Watch

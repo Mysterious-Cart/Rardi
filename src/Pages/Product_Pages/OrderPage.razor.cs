@@ -33,17 +33,7 @@ namespace CHKS.Pages
 
         private async Task OnOrderButtonClick(bool isConfirm, Order order)
         {
-            var isSure = await DialogService.ShowMessageBox(
-                "Proceed?",
-                message: "Are you sure?",
-                "Yes",
-                "Cancel",
-                null,
-                new()
-                {
-                    FullWidth = true,
-                }
-            ) ?? false;
+            var isSure = true;
 
             if (isSure == false) return;
 
@@ -62,7 +52,7 @@ namespace CHKS.Pages
             }
             catch (Exception exc)
             {
-                await DialogService.ShowMessageBox("Failed to process order", $"ERROR: {exc.Message}", "Ok");
+                Console.WriteLine($"Failed to process order: {exc.Message}");
             }
 
             await InventoryService.GetOngoingOrders();

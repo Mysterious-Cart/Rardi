@@ -10,7 +10,7 @@
 
 
 <MudDataGrid T="Vehicle" FixedHeader Height="70dvh" 
-ServerData=@(s => GetCarRecord(s.PageSize, s.Page))
+ServerData="GetCarRecord"
 Search="true" Paging="true" PageSize="20" ReadOnly @ref="_grid">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Vehicle</MudText>
@@ -47,9 +47,9 @@ Search="true" Paging="true" PageSize="20" ReadOnly @ref="_grid">
     }
 
     private string _searchString = "";
-    private async Task<GridData<Vehicle>> GetCarRecord(int PageSize, int page){
+    private async Task<GridData<Vehicle>> GetCarRecord(GridState<Vehicle> state){
         GridData<Vehicle> grid_data = new GridData<Vehicle>();
-        var vehicle_info = await VehicleService.GetVehicleDetails(Page: page, PageSize: PageSize, Search_Text: _searchString);
+        var vehicle_info = await VehicleService.GetVehicleDetails(Page: state.Page, PageSize: state.PageSize, Search_Text: _searchString);
         grid_data.Items = vehicle_info?.vehicles??[];
         grid_data.TotalItems = vehicle_info?.Total??0;
         return grid_data;

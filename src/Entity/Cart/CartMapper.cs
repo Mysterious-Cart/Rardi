@@ -22,6 +22,7 @@ public static class CartExpressionMapper
     public static Expression<Func<CartItemModel, CartItem>> ToCartItem() =>
         model => new CartItem
         (
+            
             model.ProductId,
             model.Qty,
             model.PriceOverwrite ?? model.Inventory.Export

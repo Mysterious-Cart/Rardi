@@ -56,20 +56,14 @@
     [Inject] protected CartControlService cartControl { get; set; }
     [Inject] protected NavigationManager navigationManager { get; set; }
 
-    private IEnumerable<Entity.Customer> Customers;
+    private IEnumerable<Customer> Customers;
     private IEnumerable<Cart> Cart;
     private record SuggestionItem(string Plate_Numbers, bool isCart = false, int? CartId = null);
 
     private async Task GetCustomers() => await cartControl.GetCustomer();
 
     private async Task AddCart(string customerId) { 
-        var confirmation = await dialogService.ShowMessageBox(
-            new MessageBoxOptions {
-                Title = CartCreationConfirmationTitle,
-                CancelText = "Cancel",
-                YesText = "Ok",
-                Message = CartCreationConfirmationText,
-        });
+        var confirmation = true;
 
         try{
             if(confirmation == true){

@@ -1,6 +1,8 @@
+
+@namespace CHKS.Pages.Components
 @using MudBlazor
 @inject IDialogService DialogService
-@namespace CHKS.Pages.Components
+
 
 <MudDialog>
     <DialogContent>
@@ -17,7 +19,7 @@
 @code {
     [Inject]public EmployeeControl EmployeeControl { get; set; }
     [CascadingParameter] 
-    public MudDialogInstance MudDialog { get; set; }
+    public IMudDialogInstance MudDialog { get; set; }
     [Parameter]
     public int GroupId { get; set; }
     private MudForm form;

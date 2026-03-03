@@ -4,6 +4,11 @@ using CHKS.Entity;
 
 namespace CHKS.Services;
 
+
+/// <summary>
+/// This service manages the connection to the InventoryNotificationHub and provides methods to send and receive messages related to inventory changes.
+/// It allows components to subscribe to inventory change notifications and ensures proper connection management, including starting, stopping, and disposing of the hub connection.
+/// </summary>
 public class InventoryNotificationHubConnectionService : IAsyncDisposable
 {
 

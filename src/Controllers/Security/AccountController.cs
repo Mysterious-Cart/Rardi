@@ -83,7 +83,7 @@ namespace CHKS.Controllers
                     }
                 }
 
-                return RedirectWithError("Invalid userEE or password", redirectUrl);
+                return RedirectWithError("Invalid user or password", redirectUrl);
             }
             catch (Exception exception)
             {
