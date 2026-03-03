@@ -1,0 +1,45 @@
+@namespace CHKS.Pages.Component
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body2" Style="margin-bottom:12px; color: var(--mud-palette-text-secondary);">
+            The following items could not be added to the cart. Items highlighted in red are out of stock.
+        </MudText>
+        <MudList T="PackageItem" ReadOnly Dense Gutters="false">
+            @foreach (var item in AllItems)
+            {
+                var isOutOfStock = OutOfStockIds.Contains(item.ProductId);
+                <MudListItem Gutters="false">
+                    <MudPaper Outlined="true" Style="@($"padding:6px 12px; background-color:{(isOutOfStock ? "rgba(244,67,54,0.08)" : "transparent")}")">
+                        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                            <MudText Typo="Typo.body2" Style="@(isOutOfStock ? "color:var(--mud-palette-error); font-weight:500" : "")">
+                                @item.ProductName
+                            </MudText>
+                            <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">x@item.Quantity</MudText>
+                                @if (isOutOfStock)
+                                {
+                                    <MudChip T="string" Color="Color.Error" Size="Size.Small" Variant="Variant.Filled">Out of stock</MudChip>
+                                }
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                </MudListItem>
+            }
+        </MudList>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Outlined" Color="Color.Default">Cancel</MudButton>
+        <MudButton OnClick="Continue" Variant="Variant.Filled" Color="Color.Primary">Continue</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public IEnumerable<PackageItem> AllItems { get; set; } = [];
+    [Parameter] public IEnumerable<Guid> OutOfStockIds { get; set; } = [];
+
+    private void Continue() => MudDialog.Close(DialogResult.Ok(true));
+    private void Cancel() => MudDialog.Cancel();
+}
