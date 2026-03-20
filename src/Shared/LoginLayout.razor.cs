@@ -1,5 +1,5 @@
 using System.Net.Http;
-using CHKS.Services;
+using CHKS.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;

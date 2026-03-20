@@ -108,8 +108,8 @@
     [Inject]
     public InventoryNotificationHubConnectionService InvenNotiConService { get; set; }
     private List<Group> Groups { get; set; } = [];
-    private List<Entity.Employee> Employees { get; set; } = [];
-    private IEnumerable<Entity.StockLogs> stockLogs { get; set; } = [];
+    private List<CHKS.Domain.Entities.Employee> Employees { get; set; } = [];
+    private IEnumerable<CHKS.Domain.Entities.StockLogs> stockLogs { get; set; } = [];
     private int selectedGroupId = 0;
     private int selectedEmployeeId = 0;
     private int selectedCarId = 0;
@@ -132,12 +132,12 @@
         }
     }
 
-    private void OnLogsReceived(Entity.StockLogs logs)
+    private void OnLogsReceived(CHKS.Domain.Entities.StockLogs logs)
     {
         InvokeAsync(StateHasChanged);
     }
 
-    private async Task SelectEmployee(Entity.Employee employee){
+    private async Task SelectEmployee(CHKS.Domain.Entities.Employee employee){
         selectedEmployeeId = employee.Id;
         stockLogs = await EmployeeService.GetEmployeeLogs(employee.Id);
     }

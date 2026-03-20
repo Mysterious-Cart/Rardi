@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
-using CHKS.Services;
+using CHKS.Application.Services;
 using MudBlazor;
 
 namespace CHKS.Pages

@@ -2,7 +2,7 @@
 @namespace CHKS.Pages
 @using Components;
 @using Microsoft.AspNetCore.SignalR.Client;
-@using Entity;
+@using CHKS.Domain.Entities;
 @using Heron.BlazorQRScanner;
 
 
@@ -113,7 +113,7 @@
     }
 
     private async Task SendChangesLog(){
-        await InventoryHubConnection.SendChangesLog(new Entity.StockLogs{
+        await InventoryHubConnection.SendChangesLog(new CHKS.Domain.Entities.StockLogs{
             Id = Guid.NewGuid(),
             EmployeeId = Selected_Employee?.Id ?? 0,
             ProductId = ProductId,

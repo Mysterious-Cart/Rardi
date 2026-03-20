@@ -5,7 +5,7 @@ using CHKS.Data;
 using Microsoft.AspNetCore.Identity;
 using CHKS.Models;
 using MudBlazor.Services;
-using CHKS.Services;
+using CHKS.Application.Services;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Components;
 
@@ -26,6 +26,7 @@ builder.Services
     .AddScoped<StockLogsTrackingService>()
     .AddScoped<EmployeeControl>()
     .AddScoped<SecurityService>()
+    .AddScoped<PackageService>()
     .AddTransient<VehicleAPI>()
     .AddSignalR(options =>
     {

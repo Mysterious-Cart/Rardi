@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using CHKS.Enum;
+using CHKS.Domain.Enums;
 
 namespace CHKS.Models
 {

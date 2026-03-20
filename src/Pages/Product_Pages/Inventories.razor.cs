@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
-using CHKS.Services;
+using CHKS.Application.Services;
 using System.Linq.Dynamic.Core;
 using MudBlazor;
-using CHKS.Entity;
+using CHKS.Domain.Entities;
 using CHKS.Pages.Component;
 
 namespace CHKS.Pages
@@ -81,10 +81,10 @@ namespace CHKS.Pages
             isEditing = true;
             ModifyProduct = await MudDialogService
                 .ShowAsync<CreateProduct>("Modify Product",
-                    new DialogParameters
+                    new DialogParameters<CreateProduct>
                     {
-                        ["Mode"] = sbyte.Parse("1"),
-                        ["_product"] = item
+                        { x => x.Mode, 1 },
+                        { x => x.ExistingProduct, item },
                     },
                     new DialogOptions
                     {
@@ -93,15 +93,13 @@ namespace CHKS.Pages
                         BackdropClick = false,
                         CloseButton = true,
                         CloseOnEscapeKey = true,
-
                     });
 
             var result = await ModifyProduct.Result;
-            if (result.Data is not null && result.Data.Equals(true))
+            if (!result.Canceled)
             {
                 await GetProductFromInventory();
                 await Search(search);
-
             }
             isEditing = false;
 
@@ -120,6 +118,13 @@ namespace CHKS.Pages
                         CloseButton = true,
                         CloseOnEscapeKey = true
                     });
+
+            var result = await NewProduct.Result;
+            if (!result.Canceled)
+            {
+                await GetProductFromInventory();
+                await Search(search);
+            }
         }
         public async ValueTask DisposeAsync()
         {

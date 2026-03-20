@@ -3,8 +3,8 @@
 @namespace CHKS.Pages.Component
 
 @using Pages.Component.Popup;
-@using Entity;
-@using Services;
+@using CHKS.Domain.Entities;
+@using CHKS.Application.Services;
 @using CHKS.Pages;
 
 @implements IAsyncDisposable;
@@ -17,10 +17,10 @@
 @code{
     [Inject] protected IDialogService _DialogService { get; set; }
     [Parameter] public string Height {get; set;} = "100%";
-    [Parameter] public EventCallback<Entity.Customer> OnRowClick{get; set;}
+    [Parameter] public EventCallback<CHKS.Domain.Entities.Customer> OnRowClick{get; set;}
 
-    private IEnumerable<Entity.Customer> _Customer = [];
-    private IEnumerable<Entity.Customer> Display_Customer = [];
+    private IEnumerable<CHKS.Domain.Entities.Customer> _Customer = [];
+    private IEnumerable<CHKS.Domain.Entities.Customer> Display_Customer = [];
 
 
     protected async override Task OnInitializedAsync()
@@ -53,8 +53,8 @@
         
     }
 
-    private Entity.Customer SelectedItem;
-    private void RowClick(Entity.Customer SelectedCar){
+    private CHKS.Domain.Entities.Customer SelectedItem;
+    private void RowClick(CHKS.Domain.Entities.Customer SelectedCar){
         if(SelectedCar is null){return;}
         OnRowClick.InvokeAsync(SelectedCar);
     }

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
-using CHKS.Services;
+using CHKS.Application.Services;
 
 namespace CHKS.Pages
 {
