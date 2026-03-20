@@ -1,0 +1,44 @@
+@namespace CHKS.Pages.Component
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid">
+            <MudTextField T="string"
+                Label="Package Name"
+                Required="true"
+                RequiredError="Name is required"
+                @bind-Value="_name"
+                ShrinkLabel />
+            <MudTextField T="string"
+                Label="Description"
+                Lines="2"
+                @bind-Value="_description"
+                ShrinkLabel
+                Style="margin-top:12px" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Outlined">Cancel</MudButton>
+        <MudButton OnClick="Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="!_isValid">Create</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [Inject] private PackageService PackageService { get; set; }
+
+    private MudForm _form;
+    private bool _isValid;
+    private string _name = "";
+    private string _description = "";
+
+    private async Task Submit()
+    {
+        await _form.Validate();
+        if (!_isValid) return;
+        await PackageService.CreatePackage(new CreatePackageRequest(_name, _description));
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

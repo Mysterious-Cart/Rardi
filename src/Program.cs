@@ -26,6 +26,7 @@ builder.Services
     .AddScoped<StockLogsTrackingService>()
     .AddScoped<EmployeeControl>()
     .AddScoped<SecurityService>()
+    .AddScoped<PackageService>()
     .AddTransient<VehicleAPI>()
     .AddSignalR(options =>
     {
