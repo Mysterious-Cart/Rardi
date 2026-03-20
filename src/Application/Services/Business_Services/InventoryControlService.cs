@@ -127,6 +127,64 @@ public class InventoryControlService(
     }
 
     /// <summary>
+    /// Updates an existing product.
+    /// </summary>
+    /// <param name="productId">The unique identifier of the product to update.</param>
+    /// <param name="product">The updated product data.</param>
+    public async Task<Result> UpdateProduct(Guid productId, CreateProductRequest product)
+    {
+        if (product == null)
+            return new Result.Failure("INVALID_INPUT", "Product cannot be null.");
+        if (productId == Guid.Empty)
+            return new Result.Failure("INVALID_INPUT", "Product ID cannot be empty.");
+
+        var validator = new ProductValidator();
+        var validationResult = await validator.ValidateAsync(product);
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors
+                .GroupBy(error => error.PropertyName)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Select(error => error.ErrorMessage).ToArray());
+            return new Result.Failure("VALIDATION_ERROR", "Product validation failed.", errors);
+        }
+
+        var exists = await _context.Inventory.AnyAsync(i => i.Id == productId);
+        if (!exists)
+            return new Result.Failure("NOT_FOUND", "Product not found.");
+
+        try
+        {
+            var setting = product.Setting;
+            await _context.Inventory
+                .Where(i => i.Id == productId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(i => i.Name, product.Name)
+                    .SetProperty(i => i.Normalized_Name, product.Name.ToUpper())
+                    .SetProperty(i => i.Stock, product.Stock)
+                    .SetProperty(i => i.Import, product.Import)
+                    .SetProperty(i => i.Export, product.Export)
+                    .SetProperty(i => i.Description, product.Description ?? "")
+                    .SetProperty(i => i.Status, product.Status)
+                    .SetProperty(i => i.AllowTracking, setting != null && setting.IsTracking)
+                    .SetProperty(i => i.AllowWarning, setting != null && setting.IsAllowLowWarning));
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogError(ex, "Failed to update product: {ProductName}", product.Name);
+            return new Result.Failure("DB_ERROR", "Failed to update product.");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected error updating product: {ProductName}", product.Name);
+            return new Result.Failure("UNEXPECTED_ERROR", "Unexpected error updating product.");
+        }
+
+        return new Result.Success(null);
+    }
+
+    /// <summary>
     /// Adds items to the stock of a product.
     /// </summary>
     /// <param name="ProductId">The unique identifier of the product.</param>

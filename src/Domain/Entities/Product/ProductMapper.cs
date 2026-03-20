@@ -44,11 +44,14 @@ public static class ProductExpressionMapper
         {
             Id = Guid.NewGuid(),
             Name = product.Name,
+            Normalized_Name = product.Name.ToUpper(),
             Stock = product.Stock,
             Import = product.Import,
             Export = product.Export,
-            Description = product.Description,
-            Status = product.Status
+            Description = product.Description ?? "",
+            Status = product.Status,
+            AllowTracking = product.Setting != null && product.Setting.IsTracking,
+            AllowWarning = product.Setting != null && product.Setting.IsAllowLowWarning,
         };
 }
 
@@ -99,10 +102,13 @@ public static class ProductMapper
         {
             Id = Guid.NewGuid(),
             Name = request.Name,
+            Normalized_Name = request.Name.ToUpper(),
             Stock = request.Stock,
             Import = request.Import,
             Export = request.Export,
-            Description = request.Description,
-            Status = request.Status
+            Description = request.Description ?? "",
+            Status = request.Status,
+            AllowTracking = request.Setting?.IsTracking ?? true,
+            AllowWarning = request.Setting?.IsAllowLowWarning ?? true,
         };
 }

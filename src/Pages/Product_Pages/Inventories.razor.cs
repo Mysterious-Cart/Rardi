@@ -81,7 +81,11 @@ namespace CHKS.Pages
             isEditing = true;
             ModifyProduct = await MudDialogService
                 .ShowAsync<CreateProduct>("Modify Product",
-                    
+                    new DialogParameters<CreateProduct>
+                    {
+                        { x => x.Mode, 1 },
+                        { x => x.ExistingProduct, item },
+                    },
                     new DialogOptions
                     {
                         FullWidth = true,
@@ -89,15 +93,13 @@ namespace CHKS.Pages
                         BackdropClick = false,
                         CloseButton = true,
                         CloseOnEscapeKey = true,
-
                     });
 
             var result = await ModifyProduct.Result;
-            if (result.Data is not null && result.Data.Equals(true))
+            if (!result.Canceled)
             {
                 await GetProductFromInventory();
                 await Search(search);
-
             }
             isEditing = false;
 
@@ -116,6 +118,13 @@ namespace CHKS.Pages
                         CloseButton = true,
                         CloseOnEscapeKey = true
                     });
+
+            var result = await NewProduct.Result;
+            if (!result.Canceled)
+            {
+                await GetProductFromInventory();
+                await Search(search);
+            }
         }
         public async ValueTask DisposeAsync()
         {

@@ -82,11 +82,10 @@
             </MudForm>
             </MudTabPanel>
             <MudTabPanel Icon="@Icons.Material.Filled.QrCode2" >
-                <!--
-                @if(Mode == 1){
-                    <MudImage Style="width:50%; margin-left:auto; margin-right:auto; aspect-ratio: 1:1;" 
-                        Src="@(string.Format(" data:image /svg+xml;base64,{0}", GenerateQR(_product.Id)))"/>
-                }-->
+                @if(Mode == 1 && ExistingProduct is not null){
+                    <MudImage Style="width:50%; margin-left:auto; margin-right:auto; aspect-ratio: 1;" 
+                        Src="@GetQRDataUri(ExistingProduct.Id)"/>
+                }
             </MudTabPanel>
             <MudTabPanel Icon="@Icons.Material.Filled.Difference">
                 
@@ -118,19 +117,53 @@
     [Inject] protected SecurityService securityService { get; set; }
     [Inject] protected InventoryControlService inventoryControlService {get; set;}
 
+    /// <summary>
+    /// 0 = Create mode, 1 = Edit mode
+    /// </summary>
+    [Parameter]
+    public int Mode { get; set; } = 0;
+
+    /// <summary>
+    /// The existing product to edit. Only used when Mode == 1.
+    /// </summary>
+    [Parameter]
+    public Product ExistingProduct { get; set; }
+
     private ProductValidator _productValidator = new();
     private bool isLoading = false;
     private bool isValid = false;
     
     private NewProductProperty newProduct = new();
     private List<Vehicle> SelectedVehiclesList = [];
+
+    protected override void OnParametersSet()
+    {
+        if (Mode == 1 && ExistingProduct is not null)
+        {
+            newProduct.name = ExistingProduct.Name;
+            newProduct.stock = ExistingProduct.Stock;
+            newProduct.import = ExistingProduct.Import;
+            newProduct.export = ExistingProduct.Export;
+            newProduct.description = ExistingProduct.Description;
+            newProduct.isTracking = ExistingProduct.Setting.IsTracking;
+            newProduct.isAllowLowWarning = ExistingProduct.Setting.IsAllowLowWarning;
+        }
+    }
+
     private void AddCapableVehicle(Vehicle vehicle){
         if(vehicle is null) return;
         if(SelectedVehiclesList.Any(i => i.GetId() == vehicle.GetId())) return;
         SelectedVehiclesList.Add(vehicle);
         Console.WriteLine($"Selected {vehicle.GetModel()}");
     }
-    private async Task Submit() => await CreateNewProduct();
+    private async Task Submit()
+    {
+        if (Mode == 1)
+            await EditProduct();
+        else
+            await CreateNewProduct();
+    }
+
     private async Task CreateNewProduct(){
         if (!isValid) return;
         var Product = new CreateProductRequest
@@ -167,12 +200,51 @@
         MudDialog.Close(DialogResult.Ok<Product>(ProductMapper.ToProduct(Product)));
     }
 
+    private async Task EditProduct(){
+        if (!isValid || ExistingProduct is null) return;
+        var request = new CreateProductRequest
+        (
+            newProduct.name,
+            newProduct.stock,
+            newProduct.import,
+            newProduct.export,
+            newProduct.description,
+            ExistingProduct.Status,
+            new ProductSetting
+            (
+                newProduct.isTracking,
+                newProduct.isAllowLowWarning
+            )
+        );
+
+        try
+        {
+            var updateResult = await inventoryControlService.UpdateProduct(ExistingProduct.Id, request);
+            if (updateResult is CHKS.Domain.Entities.Result.Failure updateFailure)
+            {
+                Console.WriteLine($"Failed to update product: {updateFailure.Message}");
+                return;
+            }
+
+            Console.WriteLine($"Updated Product {request.Name}");
+        }
+        catch (Exception exc) {
+            Console.WriteLine($"Failed to update product: {exc.Message}");
+            return;
+        }
+
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
     private string GenerateQR(Guid ProductId){
         using var QRGenerator = new QRCodeGenerator();
         using var QRCode = QRGenerator.CreateQrCode(ProductId.ToString(), QRCodeGenerator.ECCLevel.Q);
         using var QRCodeImage = new Base64QRCode(QRCode);
         return QRCodeImage.GetGraphic(20);
     }
+
+    private string GetQRDataUri(Guid ProductId) =>
+        $"data:image/svg+xml;base64,{GenerateQR(ProductId)}";
 
     private void Cancel(){
         MudDialog.Close(DialogResult.Cancel());
