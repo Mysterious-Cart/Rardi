@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
-using CHKS.Services;
+using CHKS.Application.Services;
 using System.Linq.Dynamic.Core;
 using MudBlazor;
-using CHKS.Entity;
+using CHKS.Domain.Entities;
 using CHKS.Pages.Component;
 
 namespace CHKS.Pages
@@ -81,11 +81,7 @@ namespace CHKS.Pages
             isEditing = true;
             ModifyProduct = await MudDialogService
                 .ShowAsync<CreateProduct>("Modify Product",
-                    new DialogParameters
-                    {
-                        ["Mode"] = sbyte.Parse("1"),
-                        ["_product"] = item
-                    },
+                    
                     new DialogOptions
                     {
                         FullWidth = true,

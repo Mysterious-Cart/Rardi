@@ -149,13 +149,21 @@ public class CartControlService(
             if (await cartcontent.AnyAsync())
             {
                 // Product already exists in the cart, update quantity
-                await stockControl.RemoveItemFromStock(productId, Qty);
+                var removeStockResult = await stockControl.RemoveItemFromStock(productId, Qty);
+                if (removeStockResult is Result.Failure removeStockFailure)
+                {
+                    throw new InvalidOperationException(removeStockFailure.Message);
+                }
                 await cartcontent.ExecuteUpdateAsync(v => v.SetProperty(i => i.Qty, i => i.Qty + Qty));
             }
             else
             {
                 // Product does not exist in the cart, add new item
-                await stockControl.RemoveItemFromStock(productId, Qty);
+                var removeStockResult = await stockControl.RemoveItemFromStock(productId, Qty);
+                if (removeStockResult is Result.Failure removeStockFailure)
+                {
+                    throw new InvalidOperationException(removeStockFailure.Message);
+                }
                 await _context.AddAsync(cartItem);
                 await _context.SaveChangesAsync();
             }
@@ -199,12 +207,20 @@ public class CartControlService(
             if (AmountInCart <= Deduction)
             {
                 // If the quantity to remove is greater than or equal to the existing quantity, remove the item
-                await stockControl.AddItemToStock(productId, AmountInCart);
+                var addStockResult = await stockControl.AddItemToStock(productId, AmountInCart);
+                if (addStockResult is Result.Failure addStockFailure)
+                {
+                    throw new InvalidOperationException(addStockFailure.Message);
+                }
                 await _context.CartContents.Where(i => i.CartId == CartId && i.ProductId == productId).ExecuteDeleteAsync();
             }
             else
             {
-                await stockControl.AddItemToStock(productId, Deduction);
+                var addStockResult = await stockControl.AddItemToStock(productId, Deduction);
+                if (addStockResult is Result.Failure addStockFailure)
+                {
+                    throw new InvalidOperationException(addStockFailure.Message);
+                }
                 await cartcontents.ExecuteUpdateAsync(v => v.SetProperty(i => i.Qty, i => i.Qty - Deduction));
             }
 

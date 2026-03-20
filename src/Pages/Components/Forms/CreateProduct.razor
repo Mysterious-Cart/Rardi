@@ -115,7 +115,6 @@
     private IMudDialogInstance MudDialog { get; set; }
 
     [Inject] protected MudBlazor.IDialogService MudDialogService { get; set; }
-    [Inject] protected CartControlService cartControlService { get; set; }
     [Inject] protected SecurityService securityService { get; set; }
     [Inject] protected InventoryControlService inventoryControlService {get; set;}
 
@@ -148,12 +147,22 @@
                 newProduct.isAllowLowWarning
             )
         );
+
         try
         {
-            await inventoryControlService.CreateProduct(Product);
+            var createProductResult = await inventoryControlService.CreateProduct(Product);
+            if (createProductResult is CHKS.Domain.Entities.Result.Failure createProductFailure)
+            {
+                Console.WriteLine($"Failed to create product: {createProductFailure.Message}");
+                return;
+            }
 
+            Console.WriteLine($"Created Product {Product.Name}");
         }
-        catch (Exception exc) { }
+        catch (Exception exc) {
+            Console.WriteLine($"Failed to create product: {exc.Message}");
+            return;
+         }
 
         MudDialog.Close(DialogResult.Ok<Product>(ProductMapper.ToProduct(Product)));
     }

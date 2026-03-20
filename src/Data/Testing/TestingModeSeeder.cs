@@ -1,4 +1,4 @@
-using CHKS.Enum;
+using CHKS.Domain.Enums;
 using CHKS.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

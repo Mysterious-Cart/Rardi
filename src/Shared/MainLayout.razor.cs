@@ -1,4 +1,4 @@
-using CHKS.Services;
+using CHKS.Application.Services;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor;
 

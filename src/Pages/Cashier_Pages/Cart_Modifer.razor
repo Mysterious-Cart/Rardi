@@ -41,7 +41,7 @@
                                 <MudPaper Outlined="true">
                                     <MudToolBar Style="gap:20px">
 
-                                        <MudText>@cartitem</MudText>
+                                        <MudText>@cartitem.Name</MudText>
                                         <MudSpacer/>
                                         <MudChip
                                             T="string"
@@ -78,31 +78,58 @@
     </MudStack>
     <MudCard Style="width:30%">
         <MudCardContent>
-            <MudCardHeader>
-                <MudText Typo="Typo.h6">Products</MudText>
-            </MudCardHeader>
-            <MudContainer Style="gap:10px; display: flex; flex-direction: column;">
-                <MudTextField Style="margin-bottom: 10px;" T="string" Placeholder="Type to search"/>
-                
-                <MudList Padding=false  T=string Style="height:100%" Gutters=false Dense>
-                    @foreach(var i in Products)
-                    {
-                        <MudListItem 
-                                Icon=@(i.Stock.Equals(0)?Icons.Material.Rounded.Cancel:Icons.Material.Rounded.AddShoppingCart)
-                                IconColor=@(i.Stock.Equals(0)?Color.Error:Color.Primary)
-                                IconSize="Size.Small"
-                                OnClickPreventDefault=true 
-                                Style=height:50px Gutters=false 
-                                OnClick="() => AddToCart(i.Id)">
-
-                            <MudToolBar Gutters=false>
-                                <MudText>@i.Name</MudText>
-                            </MudToolBar>
-                        </MudListItem>
-                    }
-                    
-                </MudList>
-            </MudContainer>
+            <MudTabs Elevation="0" Rounded="false" PanelClass="pa-0" Style="height:100%">
+                <MudTabPanel Text="Products">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6">Products</MudText>
+                    </MudCardHeader>
+                    <MudContainer Style="gap:10px; display: flex; flex-direction: column;">
+                        <MudTextField Style="margin-bottom: 10px;" T="string" Placeholder="Type to search"
+                            DebounceInterval="200" ValueChanged="@((s) => SearchProducts(s))" />
+                        <MudList Padding=false T=string Style="height:100%" Gutters=false Dense>
+                            @foreach(var i in _filteredProducts)
+                            {
+                                <MudListItem 
+                                        Icon=@(i.Stock.Equals(0)?Icons.Material.Rounded.Cancel:Icons.Material.Rounded.AddShoppingCart)
+                                        IconColor=@(i.Stock.Equals(0)?Color.Error:Color.Primary)
+                                        IconSize="Size.Small"
+                                        OnClickPreventDefault=true 
+                                        Style=height:50px Gutters=false 
+                                        OnClick="() => AddToCart(i.Id)">
+                                    <MudToolBar Gutters=false>
+                                        <MudText>@i.Name</MudText>
+                                    </MudToolBar>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudContainer>
+                </MudTabPanel>
+                <MudTabPanel Text="Packages">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6">Packages</MudText>
+                    </MudCardHeader>
+                    <MudContainer Style="gap:10px; display:flex; flex-direction:column;">
+                        <MudTextField Style="margin-bottom:10px;" T="string" Placeholder="Search packages"
+                            DebounceInterval="200" ValueChanged="@((s) => SearchPackages(s))" />
+                        <MudList Padding=false T=string Gutters=false Dense>
+                            @foreach (var pkg in _filteredPackages)
+                            {
+                                <MudListItem Gutters=false Style="height:50px"
+                                    OnClick="@(() => ApplyPackage(pkg))">
+                                    <MudToolBar Gutters=false>
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.body2">@pkg.Name</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                @pkg.Items.Count() item(s)
+                                            </MudText>
+                                        </MudStack>
+                                    </MudToolBar>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudContainer>
+                </MudTabPanel>
+            </MudTabs>
         </MudCardContent>
     </MudCard>
 </MudStack>
@@ -116,10 +143,17 @@
     protected CartControlService cartControl { get; set; }
     [Inject]
     protected InventoryControlService inventoryControl { get; set; }
+    [Inject]
+    protected PackageService packageService { get; set; }
+    [Inject]
+    protected IDialogService DialogService { get; set; }
     [Parameter]
     public int Cart_Id { get; set; }
     public Cart Cart { get; set; } = null;
     private List<Product> Products { get; set; } = [];
+    private IEnumerable<Product> _filteredProducts = [];
+    private List<Package> _packages = [];
+    private IEnumerable<Package> _filteredPackages = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -131,8 +165,22 @@
             Cart = await cartControl.GetCart(Cart_Id);
         }
         Products = (await inventoryControl.GetProductList()).ToList();
+        _filteredProducts = Products;
+        _packages = await packageService.GetPackages();
+        _filteredPackages = _packages;
     }
     private void returnBack() => navigationManager.NavigateTo("/");
+
+    private void SearchProducts(string text) =>
+        _filteredProducts = string.IsNullOrWhiteSpace(text)
+            ? Products
+            : Products.Where(p => p.Name.Contains(text, StringComparison.OrdinalIgnoreCase));
+
+    private void SearchPackages(string text) =>
+        _filteredPackages = string.IsNullOrWhiteSpace(text)
+            ? _packages
+            : _packages.Where(p => p.Name.Contains(text, StringComparison.OrdinalIgnoreCase));
+
     private async Task RemoveFromCart(Guid productId) {
         await cartControl.RemoveProductFromCart(Cart_Id, productId);
         await RetrieveData();
@@ -140,7 +188,32 @@
     }
     private async Task AddToCart(Guid productId) { 
         var result = await cartControl.AddProductToCart(Cart_Id, productId);
-        
+        await RetrieveData();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ApplyPackage(Package pkg)
+    {
+        var outOfStock = await packageService.GetOutOfStockItems(pkg.Id);
+
+        if (outOfStock.Any())
+        {
+            var dialog = await DialogService.ShowAsync<CHKS.Pages.Component.OutOfStockDialog>(
+                "Skip out of stock items?",
+                new DialogParameters
+                {
+                    [nameof(CHKS.Pages.Component.OutOfStockDialog.AllItems)] = pkg.Items,
+                    [nameof(CHKS.Pages.Component.OutOfStockDialog.OutOfStockIds)] = outOfStock.Select(i => i.ProductId).ToList()
+                },
+                new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false }
+            );
+
+            var result = await dialog.Result;
+            if (result.Canceled) return;
+        }
+
+        var skipIds = outOfStock.Select(i => i.ProductId);
+        await packageService.ApplyPackageToCart(Cart_Id, pkg.Id, skipIds);
         await RetrieveData();
         await InvokeAsync(StateHasChanged);
     }

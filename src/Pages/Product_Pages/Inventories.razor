@@ -1,8 +1,6 @@
 @page "/inventories"
-
-@attribute [Authorize]
 @namespace CHKS.Pages
-
+@attribute [Authorize]
 <PageTitle>Inventory</PageTitle>
 
 <MudDataGrid 
@@ -10,7 +8,7 @@
     T="Product" 
     ReadOnly
     ItemSize="15"
-    Items="@inventories" 
+    @bind-Items="@inventories" 
     Elevation="0"
     Virtualize=true
     Height="85dvh"

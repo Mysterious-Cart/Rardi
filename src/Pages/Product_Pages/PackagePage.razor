@@ -1,41 +1,78 @@
 @page "/packages"
-<MudText Typo="Typo.h4">
-    Packages
-</MudText>
-<MudTextField T="string" Placeholder="Type to search" Style="margin-top:20px; width:60% "/>
-<MudCard Style="margin-top:50px; width:350px; height:65%;">
-    <MudCardHeader Style="justify-content: space-between;">
-        <MudText>Oil Changes 5W30</MudText>
-        <MudIconButton Size=Size.Small Icon="@Icons.Material.Outlined.MoreHoriz"/>
-    </MudCardHeader>
-    <MudCardContent Style="overflow-y:hidden;">
-        <MudList T="string" ReadOnly Gutters=false Style="height:90%; overflow-y:scroll">
-            @for(int i = 0; i < 10; i++){
-                <MudListItem Gutters=false>
-                    <MudContainer class="package-item-container" >
-                        <MudText Inline 
-                            class="package-item" Typo="Typo.body2">Something is wrong ahahahhahah</MudText>
-                        <MudText>@i</MudText>
-                        <MudText>$80</MudText>
-                    </MudContainer>
-                </MudListItem>  
+@attribute [Authorize]
+@namespace CHKS.Pages
+
+<PageTitle>Packages</PageTitle>
+
+<MudStack Style="padding:20px; height:100%">
+    <MudToolBar Gutters="false">
+        <MudText Typo="Typo.h5">Packages</MudText>
+        <MudSpacer />
+        <MudTextField T="string"
+            Placeholder="Search packages"
+            Adornment="Adornment.Start"
+            AdornmentIcon="@Icons.Material.Rounded.Search"
+            Variant="Variant.Text"
+            DebounceInterval="200"
+            ValueChanged="@((s) => Search(s))"
+            Style="max-width:280px" />
+        <MudButton
+            Variant="Variant.Outlined"
+            Color="Color.Primary"
+            Size="Size.Small"
+            StartIcon="@Icons.Material.Rounded.Add"
+            Style="margin-left:12px"
+            OnClick="OpenCreateDialog">New Package</MudButton>
+    </MudToolBar>
+
+    @if (isLoading)
+    {
+        <MudProgressLinear Indeterminate Color="Color.Primary" />
+    }
+    else if (!filtered.Any())
+    {
+        <MudText Color="Color.Secondary" Style="margin-top:40px; text-align:center">No packages found.</MudText>
+    }
+    else
+    {
+        <MudStack Row Wrap="Wrap.Wrap" Spacing="3" Style="margin-top:16px">
+            @foreach (var pkg in filtered)
+            {
+                <MudCard Style="width:320px; min-height:200px; cursor:pointer" @onclick="@(() => NavigationManager.NavigateTo($"/packagemodifier/{pkg.Id}"))">
+                    <MudCardHeader Style="justify-content:space-between; padding-bottom:0">
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.subtitle1" Style="font-weight:600">@pkg.Name</MudText>
+                            @if (!string.IsNullOrEmpty(pkg.Description))
+                            {
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@pkg.Description</MudText>
+                            }
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIconButton Icon="@Icons.Material.Outlined.Edit" Size="Size.Small" />
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardContent Style="padding-top:8px">
+                        <MudList T="PackageItem" ReadOnly Dense Gutters="false" Style="max-height:180px; overflow-y:auto">
+                            @foreach (var item in pkg.Items)
+                            {
+                                <MudListItem Gutters="false">
+                                    <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                        <MudText Typo="Typo.body2" Style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:160px">
+                                            @item.ProductName
+                                        </MudText>
+                                        <MudStack Row Spacing="2" AlignItems="AlignItems.Center">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">x@item.Quantity</MudText>
+                                            <MudText Typo="Typo.caption">@item.ProductPrice.ToString("$0.00")</MudText>
+                                        </MudStack>
+                                    </MudStack>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudCardContent>
+                </MudCard>
             }
-            
-        </MudList>
-        
-    </MudCardContent>
-</MudCard>
-
-<style>
-    .package-item-container{
-        display:flex; 
-        justify-content: space-between;
+        </MudStack>
     }
-    .package-item{
-        width:70%; 
-        overflow:hidden;
-        text-overflow: ellipsis; 
-        white-space: nowrap;
-    }
+</MudStack>
 
-</style>
+@code { }

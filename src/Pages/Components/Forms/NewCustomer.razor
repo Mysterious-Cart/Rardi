@@ -1,7 +1,7 @@
 
 @attribute [Authorize]
 @namespace CHKS.Pages.Component
-@using Enum;
+@using CHKS.Domain.Enums;
 
 <MudDialog style="max-height: max-content; width: 40%;">
     <TitleContent>
@@ -12,6 +12,7 @@
 
             <MudTextField T="string" 
                 @bind-Value="@newCustomer.Plate"
+                @ref = "@plateField"
                 Required=true
                 Label="Plate Number" 
                 InputType="InputType.Text" 
@@ -22,14 +23,16 @@
                 InputType="InputType.Text" 
                 Placeholder="Customer Name"/>
             <MudToolBar Gutters=false>
-                <MudTextField T="string" 
+                <MudTextField T="string"
+
                     @bind-Value="newCustomer.Phone"
-                    Label="Phone Number"  
+                    Label="Phone Number"
                     InputType="InputType.Text" 
                     Placeholder="Phone Number "/>
                 <MudTextField T="string" 
                     @bind-Value="newCustomer.Phone_2"
                     Label="Phone Number"  
+                    Required=false
                     InputType="InputType.Text" 
                     Placeholder="Phone Number "/>
             </MudToolBar>
@@ -70,9 +73,15 @@
     private CartControlService cartControlService { get; set; }
     private string ErrorMessage = "";
     private NewCustomerProperty newCustomer = new();
+    private MudTextField<string> plateField;
     private async Task Submit() {
-        if (newCustomer.Vehicle is null) return;
-        if (string.IsNullOrEmpty(newCustomer.Plate)) return;
+        if (string.IsNullOrEmpty(newCustomer.Plate)) {
+            ErrorMessage = "Plate number is required.";
+            await plateField.FocusAsync();
+            await plateField.Validate();
+            StateHasChanged();
+            return;
+        }
         try {
             await cartControlService.AddCustomer(
                 new CreateCustomerRequest(

@@ -1,7 +1,7 @@
 @page "/histories"
 @namespace CHKS.Pages
 @using Component;
-@using Entity;
+@using CHKS.Domain.Entities;
 
 @if (!IsDialog)
 {
@@ -81,10 +81,10 @@
     public bool IsDialog { get; set; } = false;
 
     [Parameter]
-    public EventCallback<Entity.Customer> OnRowClick { get; set; }
-    private Entity.Customer SelectedCar = null;
+    public EventCallback<CHKS.Domain.Entities.Customer> OnRowClick { get; set; }
+    private CHKS.Domain.Entities.Customer SelectedCar = null;
 
-    private IEnumerable<Entity.Customer> Customers = [];
+    private IEnumerable<CHKS.Domain.Entities.Customer> Customers = [];
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -93,7 +93,8 @@
     }
     private async Task AddCustomer()
     {
-        await MudDialog.ShowAsync<NewCustomer>();
-        StateHasChanged();
+        var result = await MudDialog.ShowAsync<NewCustomer>();
+        Customers = await cartControlService.GetCustomer();
+        await InvokeAsync(StateHasChanged);
     }
 }

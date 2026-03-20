@@ -17,6 +17,8 @@ public class Rardi_Context(DbContextOptions<Rardi_Context> options) : DbContext(
     public DbSet<EmployeeModel> Employees { get; set; }
     public DbSet<GroupModel> Groups { get; set; }
     public DbSet<UserNotificationStampModel> NotificationStampModels { get; set; }
+    public DbSet<Package_Model> Packages { get; set; }
+    public DbSet<PackageItem_Model> PackageItems { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -119,6 +121,20 @@ public class Rardi_Context(DbContextOptions<Rardi_Context> options) : DbContext(
                 b.HasKey("Id");
                 b.ToTable("Product_Profiles");
             });
+
+        builder.Entity<PackageItem_Model>()
+            .HasOne(i => i.Package)
+            .WithMany(i => i.PackageItems)
+            .HasForeignKey(i => i.PackageId)
+            .HasPrincipalKey(i => i.Id)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<PackageItem_Model>()
+            .HasOne(i => i.Product)
+            .WithMany()
+            .HasForeignKey(i => i.ProductId)
+            .HasPrincipalKey(i => i.Id)
+            .OnDelete(DeleteBehavior.ClientNoAction);
     }
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {

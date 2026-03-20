@@ -82,15 +82,23 @@ public class InventoryControlService(
     /// <param name="product">The product to create.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     /// <exception cref="ArgumentException">Thrown when a duplicate product is detected.</exception>
-    public async Task<Product> CreateProduct(CreateProductRequest product)
+    public async Task<Result> CreateProduct(CreateProductRequest product)
     {
         if (product == null)
-            throw new ArgumentNullException(nameof(product), "Product cannot be null.");
+            return new Result.Failure("INVALID_INPUT", "Product cannot be null.");
 
         var validator = new ProductValidator();
         var validationResult = await validator.ValidateAsync(product);
         if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
+        {
+            var errors = validationResult.Errors
+                .GroupBy(error => error.PropertyName)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Select(error => error.ErrorMessage).ToArray());
+
+            return new Result.Failure("VALIDATION_ERROR", "Product validation failed.", errors);
+        }
 
         var product_model = product.ToProductModel();
 
@@ -102,15 +110,15 @@ public class InventoryControlService(
         catch (DbUpdateException ex)
         {
             logger.LogError(ex, "Failed to create product: {ProductName}", product.Name);
-            throw new InvalidOperationException("Failed to create product.", ex);
+            return new Result.Failure("DB_ERROR", "Failed to create product.");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unexpected error creating product: {ProductName}", product.Name);
-            throw;
+            return new Result.Failure("UNEXPECTED_ERROR", "Unexpected error creating product.");
         }
 
-        return product_model.ToProduct();
+        return new Result.Success(product_model.ToProduct());
     }
 
     public async Task AddProductProfile()
@@ -123,24 +131,24 @@ public class InventoryControlService(
     /// </summary>
     /// <param name="ProductId">The unique identifier of the product.</param>
     /// <param name="Add">The number of items to add.</param>
-    public async Task AddItemToStock(Guid ProductId, int Add) => await ChangeStock(ProductId, Add);
+    public async Task<Result> AddItemToStock(Guid ProductId, int Add) => await ChangeStock(ProductId, Add);
 
     /// <summary>
     /// Removes items from the stock of a product.
     /// </summary>
     /// <param name="ProductId">The unique identifier of the product.</param>
     /// <param name="Deduct">The number of items to deduct.</param>
-    public async Task RemoveItemFromStock(Guid ProductId, int Deduct) => await ChangeStock(ProductId, -Deduct);
+    public async Task<Result> RemoveItemFromStock(Guid ProductId, int Deduct) => await ChangeStock(ProductId, -Deduct);
 
     /// <exception cref="ArgumentException">Unexpected parameter</exception>
     /// <exception cref="InvalidOperationException">Operation Failed</exception>
-    private async Task ChangeStock(Guid ProductId, int Changes)
+    private async Task<Result> ChangeStock(Guid ProductId, int Changes)
     {
-        if (ProductId == Guid.Empty) throw new ArgumentException("Product ID cannot be empty.", nameof(ProductId));
-        if (Changes == 0) throw new ArgumentException("Changes cannot be zero.", nameof(Changes));
+        if (ProductId == Guid.Empty) return new Result.Failure("INVALID_INPUT", "Product ID cannot be empty.");
+        if (Changes == 0) return new Result.Failure("INVALID_INPUT", "Changes cannot be zero.");
 
         if (Math.Abs(Changes) > 1000)
-            throw new ArgumentException("Cannot deduct more than 1000 items at once.", nameof(Changes));
+            return new Result.Failure("INVALID_INPUT", "Cannot change stock by more than 1000 items at once.");
 
         var product = await _context.Inventory
             .AsNoTracking()
@@ -150,20 +158,28 @@ public class InventoryControlService(
                 i.Name,
                 i.Stock
             })
-            .FirstAsync(i => i.Id == ProductId);
+            .FirstOrDefaultAsync(i => i.Id == ProductId);
 
-        if ((product.Stock - Changes) <= 0) throw new ArgumentException("Cannot exceed available stock.", nameof(Changes));
+        if (product == null)
+        {
+            return new Result.Failure("NOT_FOUND", "Product not found.");
+        }
+
+        if ((product.Stock + Changes) < 0)
+        {
+            return new Result.Failure("INVALID_OPERATION", "Cannot exceed available stock.");
+        }
 
         try
         {
             await _context.Inventory.Where(i => i.Id == ProductId)
                 .ExecuteUpdateAsync(i => i.SetProperty(x => x.Stock, x => x.Stock + Changes));
+            return new Result.Success(null);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to update stock for product: {ProductName}", product.Name);
-            // Log the error and rethrow with a more specific message
-            throw new InvalidOperationException($"Failed to update stock for product: {product.Name}", ex);
+            return new Result.Failure("DB_ERROR", $"Failed to update stock for product: {product.Name}");
         }
     }
 
@@ -181,10 +197,10 @@ public class InventoryControlService(
     /// </exception>
     /// <exception cref="InvalidOperationException">Thrown when the order creation fails.</exception>
 
-    public async Task CreateOrder(Guid productId, int amount, string Description = "", DateOnly? deliveryDate = null)
+    public async Task<Result> CreateOrder(Guid productId, int amount, string Description = "", DateOnly? deliveryDate = null)
     {
-        if (amount < 1) throw new ArgumentException("Amount cannot be less then 1.", nameof(amount));
-        if (productId == Guid.Empty) throw new ArgumentException("Product ID cannot be empty.", nameof(productId));
+        if (amount < 1) return new Result.Failure("INVALID_INPUT", "Amount cannot be less than 1.");
+        if (productId == Guid.Empty) return new Result.Failure("INVALID_INPUT", "Product ID cannot be empty.");
 
         var Product = await _context.Inventory
             .AsNoTracking()
@@ -194,7 +210,8 @@ public class InventoryControlService(
                 i.AllowTracking
             })
             .FirstOrDefaultAsync(i => i.Id == productId);
-        if (!Product.AllowTracking) throw new ArgumentException("This product is not available to restock.", nameof(productId));
+        if (Product == null) return new Result.Failure("NOT_FOUND", "Product not found.");
+        if (!Product.AllowTracking) return new Result.Failure("INVALID_OPERATION", "This product is not available to restock.");
 
         var order = new OrderModel
         {
@@ -212,16 +229,17 @@ public class InventoryControlService(
         {
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
+            return new Result.Success(null);
         }
         catch (DbException ex)
         {
             logger.LogError(ex, "Failed to create order for product {ProductId} with amount {Amount}.", productId, amount);
-            throw new InvalidOperationException("Database error occurred while creating order.", ex);
+            return new Result.Failure("DB_ERROR", "Database error occurred while creating order.");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unexpected error occurred while creating order for product {ProductId} with amount {Amount}.", productId, amount);
-            throw;
+            return new Result.Failure("UNEXPECTED_ERROR", "Unexpected error occurred while creating order.");
         }
 
     }
@@ -234,9 +252,9 @@ public class InventoryControlService(
     /// <exception cref="ArgumentException">Thrown when the order ID is empty or the order does not exist.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the order confirmation fails.</exception>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task ConfirmOrder(Guid orderID, CancellationToken token = default)
+    public async Task<Result> ConfirmOrder(Guid orderID, CancellationToken token = default)
     {
-        if (orderID == Guid.Empty) throw new ArgumentException("Order ID cannot be empty.", nameof(orderID));
+        if (orderID == Guid.Empty) return new Result.Failure("INVALID_INPUT", "Order ID cannot be empty.");
 
         using var transaction = await _context.Database.BeginTransactionAsync(token);
 
@@ -253,10 +271,15 @@ public class InventoryControlService(
                     i.IsOrderReceived,
                     i.OrderReceivedDate
                 })
-                .FirstAsync(i => i.Id == orderID, token);
+                .FirstOrDefaultAsync(i => i.Id == orderID, token);
+
+            if (order == null)
+            {
+                return new Result.Failure("NOT_FOUND", "Order not found.");
+            }
 
             if (order.IsOrderReceived)
-                throw new InvalidOperationException("Order has already been confirmed.");
+                return new Result.Failure("INVALID_OPERATION", "Order has already been confirmed.");
 
             // Update the order status
             await _context.Orders
@@ -276,17 +299,18 @@ public class InventoryControlService(
             await transaction.CommitAsync(token);
 
             logger.LogInformation("Order {OrderId} confirmed successfully", orderID);
+            return new Result.Success(null);
         }
         catch (DbUpdateException dbEx)
         {
 
             logger.LogError(dbEx, "Database error occurred while confirming order {OrderId}", orderID);
-            throw new InvalidOperationException($"Database error occurred while confirming order with ID: {orderID}", dbEx);
+            return new Result.Failure("DB_ERROR", $"Database error occurred while confirming order with ID: {orderID}");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to confirm order {OrderId}", orderID);
-            throw new InvalidOperationException($"Failed to confirm order with ID: {orderID}", ex);
+            return new Result.Failure("UNEXPECTED_ERROR", $"Failed to confirm order with ID: {orderID}");
         }
     }
 
@@ -297,9 +321,9 @@ public class InventoryControlService(
     /// <returns>A task that represents the asynchronous operation.</returns>
     /// <exception cref="ArgumentException">Thrown when the order ID is empty or the order does not exist.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the order is already cancelled or has been received.</exception>
-    public async Task CancelOrder(Guid orderID)
+    public async Task<Result> CancelOrder(Guid orderID)
     {
-        if (orderID == Guid.Empty) throw new ArgumentException("Order ID cannot be empty.", nameof(orderID));
+        if (orderID == Guid.Empty) return new Result.Failure("INVALID_INPUT", "Order ID cannot be empty.");
         try
         {
             var order = await _context.Orders
@@ -310,24 +334,31 @@ public class InventoryControlService(
                     i.IsCancelled,
                     i.IsOrderReceived
                 })
-                .FirstAsync(i => i.Id == orderID);
+                .FirstOrDefaultAsync(i => i.Id == orderID);
 
-            if (order.IsCancelled) throw new InvalidOperationException("Order is already cancelled.");
+            if (order == null)
+            {
+                return new Result.Failure("NOT_FOUND", "Order not found.");
+            }
 
-            if (order.IsOrderReceived) throw new InvalidOperationException("Cannot cancel order that has been received.");
+            if (order.IsCancelled) return new Result.Failure("INVALID_OPERATION", "Order is already cancelled.");
+
+            if (order.IsOrderReceived) return new Result.Failure("INVALID_OPERATION", "Cannot cancel order that has been received.");
             await _context.Orders.Where(i => i.Id == orderID)
                 .ExecuteUpdateAsync(x => x.SetProperty(i => i.IsCancelled, true),
                 CancellationToken.None);
+
+            return new Result.Success(null);
         }
         catch (DbUpdateException dbEx)
         {
             logger.LogError(dbEx, "Failed to cancel order with ID: {OrderId}", orderID);
-            throw new InvalidOperationException($"Database error occurred while cancelling order with ID: {orderID}", dbEx);
+            return new Result.Failure("DB_ERROR", $"Database error occurred while cancelling order with ID: {orderID}");
         }
         catch (Exception exc)
         {
             Console.Write(exc.Message);
-            throw new("Failed to cancel order.");
+            return new Result.Failure("UNEXPECTED_ERROR", "Failed to cancel order.");
         }
     }
 

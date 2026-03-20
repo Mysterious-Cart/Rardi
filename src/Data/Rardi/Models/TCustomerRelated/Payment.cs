@@ -1,6 +1,6 @@
 namespace CHKS.Models;
 
-using Enum;
+using CHKS.Domain.Enums;
 
 public class PaymentModel
 {

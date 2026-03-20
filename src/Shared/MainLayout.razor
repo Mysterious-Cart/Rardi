@@ -1,13 +1,13 @@
 @inherits LayoutComponentBase
 @inject SecurityService SecurityService;
 
-<MudThemeProvider IsDarkMode=false/>
+<MudThemeProvider Theme="@KhmerTheme" IsDarkMode=true/>
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout >
-    <MudDrawer style="width:200px" Fixed="true" Elevation="1" Variant="@DrawerVariant.Persistent" Open >
+<MudLayout>
+    <MudDrawer style="z-index: 500;" Fixed="true" Elevation="3" Variant="@DrawerVariant.Persistent" Open=true  >
         <MudNavMenu style="margin-top: 50px;" >
             <MudNavGroup Expanded title="Cashier" Icon="@Icons.Material.Filled.Sell">
                 <MudNavLink Match="NavLinkMatch.All" Href="/" Icon="@Icons.Material.Outlined.MonetizationOn">Register</MudNavLink>
@@ -36,7 +36,7 @@
             }
         </MudNavMenu>
     </MudDrawer>
-    <MudMainContent>
+    <MudMainContent Style="padding:20px">
         @Body
     </MudMainContent>
 </MudLayout>
@@ -44,7 +44,15 @@
 @code {
     MudTheme KhmerTheme = new MudTheme()
     {
-        Typography = new Typography(),
+        Typography = new Typography()
+        {
+            Default = new DefaultTypography()
+            {
+                FontFamily = new[] { "Battambang", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "0.85rem",
+            }
+        }
+        
     };
 
 }

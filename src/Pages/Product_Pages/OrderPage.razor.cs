@@ -1,8 +1,8 @@
-﻿using System.Linq.Dynamic.Core;
-using CHKS.Entity;
+using System.Linq.Dynamic.Core;
+using CHKS.Domain.Entities;
 using CHKS.Models;
 using CHKS.Pages.Component.Popup;
-using CHKS.Services;
+using CHKS.Application.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -41,11 +41,19 @@ namespace CHKS.Pages
             {
                 if (isConfirm)
                 {
-                    await InventoryService.ConfirmOrder(order.Id);
+                    var confirmResult = await InventoryService.ConfirmOrder(order.Id);
+                    if (confirmResult is Result.Failure confirmFailure)
+                    {
+                        Console.WriteLine($"Failed to confirm order: {confirmFailure.Message}");
+                    }
                 }
                 else
                 {
-                    await InventoryService.CancelOrder(order.Id);
+                    var cancelResult = await InventoryService.CancelOrder(order.Id);
+                    if (cancelResult is Result.Failure cancelFailure)
+                    {
+                        Console.WriteLine($"Failed to cancel order: {cancelFailure.Message}");
+                    }
                 }
 
 

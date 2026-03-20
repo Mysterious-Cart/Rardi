@@ -62,12 +62,18 @@
             return;
         }
         try{
-            await InventoryControlService.CreateOrder(product.Id, amount);
-
+            var createOrderResult = await InventoryControlService.CreateOrder(product.Id, amount);
+            if (createOrderResult is CHKS.Domain.Entities.Result.Failure createOrderFailure)
+            {
+                Console.WriteLine(createOrderFailure.Message);
+                IsError = true;
+                return;
+            }
         }catch(Exception e){
             Console.WriteLine(e.Message);
             Console.WriteLine("Something went wrong. Please try again later.");
             IsError = true;
+            return;
         }
 
         MudDialog.Close(DialogResult.Ok(true));
